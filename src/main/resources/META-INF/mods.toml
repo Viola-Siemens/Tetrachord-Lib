@@ -1,0 +1,29 @@
+modLoader="javafml"
+loaderVersion="[38,)"
+license="LGPL v2.1"
+issueTrackerURL="https://github.com/Viola-Siemens/Tetrachord-Lib/issues"
+
+[[mods]]
+modId="tetrachordlib"
+version="${file.jarVersion}"
+displayName="Tetrachord Lib"
+logoFile="logo.png"
+credits="Liu Dongyu"
+authors="Hexagram"
+description='''
+This mod is a lightweight library mod that adds various data structures and web socket.
+'''
+
+[[dependencies.tetrachordlib]]
+    modId="forge"
+    mandatory=true
+    versionRange="[38,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.tetrachordlib]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.18,)"
+    ordering="NONE"
+    side="BOTH"
