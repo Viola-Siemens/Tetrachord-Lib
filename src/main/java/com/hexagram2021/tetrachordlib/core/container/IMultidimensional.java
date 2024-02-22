@@ -2,6 +2,7 @@ package com.hexagram2021.tetrachordlib.core.container;
 
 import java.util.Iterator;
 
+@SuppressWarnings("unused")
 public interface IMultidimensional<T extends Comparable<T>> extends Iterable<T> {
 	/**
 	 * @return	Size of dimension.<br>
@@ -61,4 +62,7 @@ public interface IMultidimensional<T extends Comparable<T>> extends Iterable<T> 
 	IMultidimensional<T> multiply(T multiplier);
 	IMultidimensional<Double> divide(double divider);
 	IMultidimensional<Double> asDouble();
+
+	void setMin();
+	void setMax();
 }

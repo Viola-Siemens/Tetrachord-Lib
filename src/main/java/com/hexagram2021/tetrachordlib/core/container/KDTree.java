@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicReference;
 
+@SuppressWarnings("unused")
 public interface KDTree<T, TD extends Comparable<TD>> {
 	record BuildNode<T, TD extends Comparable<TD>>(IMultidimensional<TD> value, T other) {
 		public BuildNode(IMultidimensional<TD> value, T other) {
@@ -39,6 +40,8 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 	interface KDNode<T, TD extends Comparable<TD>> {
 		IMultidimensional<TD> value();
 		T other();
+		@SuppressWarnings("BooleanMethodIsAlwaysInverted")
+		boolean removed();
 
 		/**
 		 * Compute the distance between this node and the input multidimensional position.
@@ -56,9 +59,18 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 		 */
 		void pushUp();
 		/**
+		 * Called in KDTree$remove. Only affect a single link instead of the whole tree.
+		 */
+		void pushDown();
+		/**
 		 * Called in KDTree$build. Affect the whole tree.
 		 */
 		void maintain();
+
+		default void setRemoved() {
+			this.setRemoved(true);
+		}
+		void setRemoved(boolean removed);
 
 		@Nullable
 		KDNode<T, TD> father();
@@ -92,9 +104,20 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 	 * @return				New node if not exists, or the existing node.
 	 */
 	KDNode<T, TD> insert(BuildNode<T, TD> buildNode);
+	/**
+	 * Remove a node from this KDTree. If node does not exist, no update will occur.
+	 * @param md			Node to be removed.
+	 * @return				The removed node if exists, or null if not exists.
+	 */
+	@Nullable
+	BuildNode<T, TD> remove(IMultidimensional<TD> md);
+	/**
+	 * Rebalance the entire KDTree.
+	 */
+	void rebalance();
 
 	/**
-	 * Find the closest position of the tree to target point.
+	 * Find the closest position of the tree to target point. Make sure the tree is NOT empty.
 	 * @param target	Target point to be searched for.
 	 * @return			The closest position to target. If target is in this tree, then return target.
 	 */
@@ -106,7 +129,7 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 		return answer.get();
 	}
 	/**
-	 * Find the farthest position of the tree to target point.
+	 * Find the farthest position of the tree to target point. Make sure the tree is NOT empty.
 	 * @param target	Target point to be searched for.
 	 * @return			The farthest position to target.
 	 */
@@ -127,7 +150,9 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 		q.add(root);
 		while(!q.isEmpty()) {
 			KDNode<T, TD> kdn = q.poll();
-			kdn.visit(visitFunction);
+			if(!kdn.removed()) {
+				kdn.visit(visitFunction);
+			}
 			KDNode<T, TD> lc = kdn.leftChild();
 			KDNode<T, TD> rc = kdn.rightChild();
 			if(lc != null) {
@@ -158,7 +183,10 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 	}
 
 	private static <T, TD extends Comparable<TD>> void preDfs(KDNode<T, TD> kdn, IVisitFunction.Binary<T, IMultidimensional<TD>> visitFunction) {
-		kdn.visit(visitFunction);
+		if(!kdn.removed()) {
+			kdn.visit(visitFunction);
+		}
+
 		KDNode<T, TD> lc = kdn.leftChild();
 		KDNode<T, TD> rc = kdn.rightChild();
 		if(lc != null) {
@@ -174,7 +202,11 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 		if(lc != null) {
 			inDfs(lc, visitFunction);
 		}
-		kdn.visit(visitFunction);
+
+		if(!kdn.removed()) {
+			kdn.visit(visitFunction);
+		}
+
 		if(rc != null) {
 			inDfs(rc, visitFunction);
 		}
@@ -188,7 +220,10 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 		if(rc != null) {
 			postDfs(rc, visitFunction);
 		}
-		kdn.visit(visitFunction);
+
+		if(!kdn.removed()) {
+			kdn.visit(visitFunction);
+		}
 	}
 	private static <T, TD extends Comparable<TD>> void searchForClosest(KDNode<T, TD> kdn, IMultidimensional<TD> target,
 																		AtomicDouble dist, AtomicReference<KDNode<T, TD>> answer) {
@@ -196,7 +231,7 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 		KDNode<T, TD> rc = kdn.rightChild();
 		if(lc != null) {
 			double leftDist = lc.distanceWith(target);
-			if(dist.get() > leftDist) {
+			if(!lc.removed() && dist.get() > leftDist) {
 				dist.set(leftDist);
 				answer.set(lc);
 				searchForClosest(lc, target, dist, answer);
@@ -206,7 +241,7 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 		}
 		if(rc != null) {
 			double rightDist = rc.distanceWith(target);
-			if(dist.get() > rightDist) {
+			if(!rc.removed() && dist.get() > rightDist) {
 				dist.set(rightDist);
 				answer.set(rc);
 				searchForClosest(rc, target, dist, answer);
@@ -221,7 +256,7 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 		KDNode<T, TD> rc = kdn.rightChild();
 		if(lc != null) {
 			double leftDist = lc.distanceWith(target);
-			if(dist.get() < leftDist) {
+			if(!lc.removed() && dist.get() < leftDist) {
 				dist.set(leftDist);
 				answer.set(lc);
 				searchForFarthest(lc, target, dist, answer);
@@ -231,7 +266,7 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 		}
 		if(rc != null) {
 			double rightDist = rc.distanceWith(target);
-			if(dist.get() < rightDist) {
+			if(!rc.removed() && dist.get() < rightDist) {
 				dist.set(rightDist);
 				answer.set(rc);
 				searchForFarthest(rc, target, dist, answer);

@@ -166,4 +166,13 @@ public class DoublePosition implements IMultidimensional<Double> {
 	public DoublePosition asDouble() {
 		return this.clone();
 	}
+
+	@Override
+	public void setMin() {
+		Arrays.fill(this.dimensions, Double.NEGATIVE_INFINITY);
+	}
+	@Override
+	public void setMax() {
+		Arrays.fill(this.dimensions, Double.POSITIVE_INFINITY);
+	}
 }

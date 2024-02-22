@@ -166,4 +166,13 @@ public class IntPosition implements IMultidimensional<Integer> {
 	public DoublePosition asDouble() {
 		return new DoublePosition(Arrays.stream(this.dimensions).asDoubleStream().toArray());
 	}
+
+	@Override
+	public void setMin() {
+		Arrays.fill(this.dimensions, Integer.MIN_VALUE);
+	}
+	@Override
+	public void setMax() {
+		Arrays.fill(this.dimensions, Integer.MAX_VALUE);
+	}
 }
