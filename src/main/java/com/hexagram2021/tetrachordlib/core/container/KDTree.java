@@ -9,6 +9,11 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * KD Tree is an efficient data structure to query nearest and farthest points of each given position.
+ * @param <T>		Type of data that the point is maintained.
+ * @param <TD>		Type of each dimension.
+ */
 @SuppressWarnings("unused")
 public interface KDTree<T, TD extends Comparable<TD>> {
 	record BuildNode<T, TD extends Comparable<TD>>(IMultidimensional<TD> value, T other) {

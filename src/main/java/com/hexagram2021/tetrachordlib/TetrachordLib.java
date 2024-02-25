@@ -1,6 +1,6 @@
 package com.hexagram2021.tetrachordlib;
 
-import com.hexagram2021.tetrachordlib.benchmark.*;
+//import com.hexagram2021.tetrachordlib.benchmark.*;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;

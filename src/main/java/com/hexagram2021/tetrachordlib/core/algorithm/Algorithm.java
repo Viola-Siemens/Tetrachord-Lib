@@ -112,4 +112,21 @@ public final class Algorithm {
 			quickSelect(arr, ax + 1, end, kth - m - 1, comparator);
 		}
 	}
+
+	public static int lowbit(int x) {
+		return x & -x;
+	}
+	public static int highbit(int x) {
+		int lb = lowbit(x);
+		for(;;) {
+			x -= lb;
+			int b = lowbit(x);
+			if(b > 0) {
+				lb = b;
+			} else {
+				break;
+			}
+		}
+		return lb;
+	}
 }
