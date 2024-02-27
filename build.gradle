@@ -17,7 +17,7 @@ plugins {
 }
 apply plugin: 'net.minecraftforge.gradle'
 
-version = '1.18+1.0.0'
+version = '1.19+1.0.0'
 group = 'com.hexagram2021.tetrachordlib'
 
 base {
@@ -29,7 +29,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
-    mappings channel: 'official', version: '1.18.2'
+    mappings channel: 'official', version: '1.19.2'
 
     runs {
         client {
@@ -115,12 +115,12 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.18.2-40.2.0'
+    minecraft 'net.minecraftforge:forge:1.19.2-43.3.0'
 
-    runtimeOnly fg.deobf("mezz.jei:jei-1.18.2:9.7.1.255")
-    runtimeOnly fg.deobf("curse.maven:jade-324717:4575623")
-    runtimeOnly fg.deobf("curse.maven:spark-361579:4505375")
-    runtimeOnly fg.deobf("curse.maven:worldedit-225608:3697298")
+    runtimeOnly fg.deobf("curse.maven:jei-238222:5106178")
+    runtimeOnly fg.deobf("curse.maven:jade-324717:4800904")
+    runtimeOnly fg.deobf("curse.maven:spark-361579:4505309")
+    runtimeOnly fg.deobf("curse.maven:worldedit-225608:3922622")
 }
 
 jar {
