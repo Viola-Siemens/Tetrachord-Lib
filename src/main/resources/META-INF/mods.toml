@@ -11,7 +11,7 @@ logoFile="logo.png"
 credits="Liu Dongyu"
 authors="Hexagram"
 description='''
-This mod is a lightweight library mod that adds various data structures and web socket.
+A lightweight library mod that provides various data structures such as KD Trees and Segment Trees, alongside a straightforward web socket functionality (TODO).
 '''
 
 [[dependencies.tetrachordlib]]
