@@ -1,5 +1,5 @@
-![CurseForge](http://cf.way2muchnoise.eu/980149.svg)
-![Modrinth](https://img.shields.io/modrinth/dt/tetrachord-lib?logo=modrinth&style=flat&color=242629&labelColor=5ca424&logoColor=1c1c1c)
+[![CurseForge](http://cf.way2muchnoise.eu/980149.svg)](https://legacy.curseforge.com/minecraft/mc-mods/tetrachord-lib)
+[![Modrinth](https://img.shields.io/modrinth/dt/tetrachord-lib?logo=modrinth&style=flat&color=242629&labelColor=5ca424&logoColor=1c1c1c)](https://modrinth.com/mod/tetrachord-lib)
 
 # Introduction
 
