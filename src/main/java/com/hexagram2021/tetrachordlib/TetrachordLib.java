@@ -13,7 +13,7 @@ public class TetrachordLib {
 	public static final String VERSION = ModList.get().getModFileById(MODID).versionString();
 
 	public TetrachordLib() {
-		//MinecraftForge.EVENT_BUS.register(new NoHostilesAroundCampfireImproved());
+		//MinecraftForge.EVENT_BUS.register(new OreBlocksNearBeaconIncreaseXpDrop());
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 }
