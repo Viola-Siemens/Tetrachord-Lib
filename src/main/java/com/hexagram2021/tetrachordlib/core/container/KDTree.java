@@ -3,8 +3,10 @@ package com.hexagram2021.tetrachordlib.core.container;
 import com.google.common.collect.Queues;
 import com.google.common.util.concurrent.AtomicDouble;
 import com.hexagram2021.tetrachordlib.core.container.impl.LinkedKDTree;
+import org.jetbrains.annotations.Contract;
 
 import javax.annotation.Nullable;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicReference;
@@ -14,7 +16,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @param <T>		Type of data that the point is maintained.
  * @param <TD>		Type of each dimension.
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public interface KDTree<T, TD extends Comparable<TD>> {
 	record BuildNode<T, TD extends Comparable<TD>>(IMultidimensional<TD> value, T other) {
 		public BuildNode(IMultidimensional<TD> value, T other) {
@@ -45,7 +47,6 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 	interface KDNode<T, TD extends Comparable<TD>> {
 		IMultidimensional<TD> value();
 		T other();
-		@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 		boolean removed();
 
 		/**
@@ -72,11 +73,6 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 		 */
 		void maintain();
 
-		default void setRemoved() {
-			this.setRemoved(true);
-		}
-		void setRemoved(boolean removed);
-
 		@Nullable
 		KDNode<T, TD> father();
 		@Nullable
@@ -87,6 +83,7 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 		default void visit(IVisitFunction.Binary<T, IMultidimensional<TD>> visitFunction) {
 			visitFunction.visit(this.other(), this.value());
 		}
+		KDTree<T, TD> getTree();
 	}
 
 	@Nullable
@@ -116,10 +113,20 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 	 */
 	@Nullable
 	BuildNode<T, TD> remove(IMultidimensional<TD> md);
+
+	/**
+	 * O(1) version of remove.
+	 * @param kdn			Node to be removed.
+	 * @return				The removed node if exists, or null if not exists.
+	 */
+	@Nullable
+	BuildNode<T, TD> remove(KDNode<T, TD> kdn);
 	/**
 	 * Rebalance the entire KDTree.
 	 */
 	void rebalance();
+
+	int getDimensionSize();
 
 	/**
 	 * Find the closest position of the tree to target point. Make sure the tree is NOT empty.
@@ -128,8 +135,8 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 	 */
 	default KDNode<T, TD> findClosest(IMultidimensional<TD> target) {
 		KDNode<T, TD> root = Objects.requireNonNull(this.root());
-		AtomicDouble dist = new AtomicDouble(root.distanceWith(target));
-		AtomicReference<KDNode<T, TD>> answer = new AtomicReference<>(root);
+		AtomicDouble dist = new AtomicDouble(root.removed() ? Double.POSITIVE_INFINITY : root.distanceWith(target));
+		AtomicReference<KDNode<T, TD>> answer = new AtomicReference<>(root.removed() ? null : root);
 		searchForClosest(root, target, dist, answer);
 		return answer.get();
 	}
@@ -140,8 +147,8 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 	 */
 	default KDNode<T, TD> findFarthest(IMultidimensional<TD> target) {
 		KDNode<T, TD> root = Objects.requireNonNull(this.root());
-		AtomicDouble dist = new AtomicDouble(root.distanceWith(target));
-		AtomicReference<KDNode<T, TD>> answer = new AtomicReference<>(root);
+		AtomicDouble dist = new AtomicDouble(root.removed() ? Double.NEGATIVE_INFINITY : root.distanceWith(target));
+		AtomicReference<KDNode<T, TD>> answer = new AtomicReference<>(root.removed() ? null : root);
 		searchForFarthest(root, target, dist, answer);
 		return answer.get();
 	}
@@ -279,6 +286,16 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 				searchForFarthest(rc, target, dist, answer);
 			}
 		}
+	}
+
+	@Contract(pure = true)
+	default Comparator<IMultidimensional<TD>> getComparator(int dimension) {
+		Comparator<IMultidimensional<TD>> ret = Comparator.comparing(md -> md.getDimension(dimension));
+		for(int i = 1; i < this.getDimensionSize(); ++i) {
+			int finalI = i;
+			ret = ret.thenComparing(md -> md.getDimension((dimension + finalI) % this.getDimensionSize()));
+		}
+		return ret;
 	}
 
 	static <T, TD extends Comparable<TD>> LinkedKDTree<T, TD> newLinkedKDTree(int dimensionSize) {
