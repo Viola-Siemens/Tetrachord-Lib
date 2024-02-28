@@ -17,7 +17,7 @@ plugins {
 }
 apply plugin: 'net.minecraftforge.gradle'
 
-version = '1.19+1.0.0'
+version = '1.19+1.0.1'
 group = 'com.hexagram2021.tetrachordlib'
 
 base {
@@ -117,10 +117,10 @@ repositories {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.19.2-43.3.0'
 
-    runtimeOnly fg.deobf("curse.maven:jei-238222:5106178")
-    runtimeOnly fg.deobf("curse.maven:jade-324717:4800904")
-    runtimeOnly fg.deobf("curse.maven:spark-361579:4505309")
-    runtimeOnly fg.deobf("curse.maven:worldedit-225608:3922622")
+    //runtimeOnly fg.deobf("curse.maven:jei-238222:5106178")
+    //runtimeOnly fg.deobf("curse.maven:jade-324717:4800904")
+    //runtimeOnly fg.deobf("curse.maven:spark-361579:4505309")
+    //runtimeOnly fg.deobf("curse.maven:worldedit-225608:3922622")
 }
 
 jar {

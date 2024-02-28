@@ -10,13 +10,13 @@ import java.util.*;
 
 @SuppressWarnings("unused")
 public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD> {
-	public static class LinkedKDNode<T, TD extends Comparable<TD>> implements KDNode<T, TD> {
+	public class LinkedKDNode implements KDNode<T, TD> {
 		@Nullable
-		private LinkedKDNode<T, TD> ftr;
+		private LinkedKDNode ftr;
 		@Nullable
-		private LinkedKDNode<T, TD> lc;
+		private LinkedKDNode lc;
 		@Nullable
-		private LinkedKDNode<T, TD> rc;
+		private LinkedKDNode rc;
 		private final T other;
 		private final IMultidimensional<TD> value;
 		private final IMultidimensional<TD> max;
@@ -29,11 +29,11 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 			this.min = value.clone();
 			this.other = other;
 		}
-		public LinkedKDNode(IMultidimensional<TD> value, T other, @Nullable LinkedKDNode<T, TD> ftr) {
+		public LinkedKDNode(IMultidimensional<TD> value, T other, @Nullable LinkedKDNode ftr) {
 			this(value, other);
 			this.ftr = ftr;
 		}
-		public LinkedKDNode(IMultidimensional<TD> value, T other, @Nullable LinkedKDNode<T, TD> ftr, @Nullable LinkedKDNode<T, TD> lc, @Nullable LinkedKDNode<T, TD> rc) {
+		public LinkedKDNode(IMultidimensional<TD> value, T other, @Nullable LinkedKDNode ftr, @Nullable LinkedKDNode lc, @Nullable LinkedKDNode rc) {
 			this(value, other, ftr);
 			this.lc = lc;
 			this.rc = rc;
@@ -149,20 +149,26 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 		}
 
 		@Override @Nullable
-		public LinkedKDNode<T, TD> father() {
+		public LinkedKDNode father() {
 			return this.ftr;
 		}
 		@Override @Nullable
-		public LinkedKDNode<T, TD> leftChild() {
+		public LinkedKDNode leftChild() {
 			return this.lc;
 		}
 		@Override @Nullable
-		public LinkedKDNode<T, TD> rightChild() {
+		public LinkedKDNode rightChild() {
 			return this.rc;
 		}
-
 		@Override
-		public void setRemoved(boolean removed) {
+		public LinkedKDTree<T, TD> getTree() {
+			return LinkedKDTree.this;
+		}
+
+		void setRemoved() {
+			this.setRemoved(true);
+		}
+		void setRemoved(boolean removed) {
 			if(this.removed == removed) {
 				return;
 			}
@@ -209,7 +215,7 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 
 	private final int dimensionSize;
 	@Nullable
-	private LinkedKDNode<T, TD> root = null;
+	private LinkedKDNode root = null;
 	private int size = 0;
 	private int sepDim = 0;
 
@@ -235,18 +241,18 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 	}
 
 	@Nullable
-	private transient LinkedKDNode<T, TD> hot = null;
+	private transient LinkedKDNode hot = null;
 	private transient int hotSepDim = 0;
 	@Nullable
-	private LinkedKDNode<T, TD> find(IMultidimensional<TD> md, boolean allowRemoved) {
-		LinkedKDNode<T, TD> ret = this.root;
+	private LinkedKDNode find(IMultidimensional<TD> md, boolean allowRemoved) {
+		LinkedKDNode ret = this.root;
 		this.hotSepDim = this.sepDim;
 		while(ret != null) {
 			if((!ret.removed() || allowRemoved) && ret.value().equals(md)) {
 				return ret;
 			}
 			this.hot = ret;
-			if(ret.value().getDimension(this.hotSepDim).compareTo(md.getDimension(this.hotSepDim)) < 0) {
+			if(this.getComparator(this.hotSepDim).compare(ret.value(), md) < 0) {
 				ret = ret.rightChild();
 			} else {
 				ret = ret.leftChild();
@@ -257,7 +263,7 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 	}
 
 	@Override @Nullable
-	public KDNode<T, TD> root() {
+	public LinkedKDNode root() {
 		return this.root;
 	}
 
@@ -289,21 +295,21 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 		this.hotSepDim = 0;
 	}
 
-	private LinkedKDNode<T, TD> build(BuildNode<T, TD>[] buildNodes, int beg, int end, int depth) {
+	private LinkedKDNode build(BuildNode<T, TD>[] buildNodes, int beg, int end, int depth) {
 		int nodeCount = end - beg;
 		int dimension = (this.sepDim + depth) % this.dimensionSize;
+		int kth = nodeCount / 2;
 		Algorithm.quickSelect(
-				buildNodes, beg, end, nodeCount / 2,
-				Comparator.comparing(bn -> bn.value().getDimension(dimension))
+				buildNodes, beg, end, kth, Comparator.comparing(BuildNode::value, this.getComparator(dimension))
 		);
-		BuildNode<T, TD> bn = buildNodes[beg + nodeCount / 2];
-		LinkedKDNode<T, TD> ret = new LinkedKDNode<>(bn.value(), bn.other(), this.hot);
+		BuildNode<T, TD> bn = buildNodes[beg + kth];
+		LinkedKDNode ret = new LinkedKDNode(bn.value(), bn.other(), this.hot);
 		if(nodeCount > 1) {
 			this.hot = ret;
-			ret.lc = this.build(buildNodes, beg, beg + nodeCount / 2, depth + 1);
+			ret.lc = this.build(buildNodes, beg, beg + kth, depth + 1);
 			if (nodeCount > 2) {
 				this.hot = ret;
-				ret.rc = this.build(buildNodes, beg + nodeCount / 2 + 1, end, depth + 1);
+				ret.rc = this.build(buildNodes, beg + kth + 1, end, depth + 1);
 			}
 		}
 		return ret;
@@ -330,24 +336,27 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 	}
 
 	@Override
-	public KDNode<T, TD> insert(BuildNode<T, TD> buildNode) {
+	public LinkedKDNode insert(BuildNode<T, TD> buildNode) {
 		assert buildNode.value().getDimensionSize() == this.dimensionSize :
 				"Node with dimension size %d cannot be inserted into this %d-dimension tree.".formatted(buildNode.value().getDimensionSize(), this.dimensionSize);
 		if(this.size == 0) {
-			this.root = new LinkedKDNode<>(buildNode.value(), buildNode.other());
+			this.root = new LinkedKDNode(buildNode.value(), buildNode.other());
 			this.size += 1;
 			return this.root;
 		}
-		KDNode<T, TD> kdn = this.find(buildNode.value(), true);
+		LinkedKDNode kdn = this.find(buildNode.value(), true);
 		if(kdn != null) {
-			kdn.setRemoved(false);
+			if(kdn.removed()) {
+				kdn.setRemoved(false);
+				this.size += 1;
+			}
 			return kdn;
 		}
 		this.hotSepDim = (this.hotSepDim + this.dimensionSize - 1) % this.dimensionSize;
-		if(Objects.requireNonNull(this.hot).value().getDimension(this.hotSepDim).compareTo(buildNode.value().getDimension(this.hotSepDim)) < 0) {
-			kdn = this.hot.rc = new LinkedKDNode<>(buildNode.value(), buildNode.other(), this.hot);
+		if(this.getComparator(this.hotSepDim).compare(Objects.requireNonNull(this.hot).value(), buildNode.value()) < 0) {
+			kdn = this.hot.rc = new LinkedKDNode(buildNode.value(), buildNode.other(), this.hot);
 		} else {
-			kdn = this.hot.lc = new LinkedKDNode<>(buildNode.value(), buildNode.other(), this.hot);
+			kdn = this.hot.lc = new LinkedKDNode(buildNode.value(), buildNode.other(), this.hot);
 		}
 		this.size += 1;
 		kdn.pushUp();
@@ -356,8 +365,8 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 	}
 	@Override @Nullable
 	public BuildNode<T, TD> remove(IMultidimensional<TD> md) {
-		LinkedKDNode<T, TD> kdn = this.find(md, false);
-		if(kdn == null) {
+		LinkedKDNode kdn = this.find(md, false);
+		if(kdn == null || kdn.removed()) {
 			return null;
 		}
 		kdn.setRemoved();
@@ -365,12 +374,27 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 		this.applyIdleCountAndRebalanceIfNecessary();
 		return BuildNode.of(kdn.other, kdn.value);
 	}
+	@Override @Nullable
+	public BuildNode<T, TD> remove(@Nullable KDNode<T, TD> kdn) {
+		if(kdn instanceof LinkedKDNode node && !kdn.removed()) {
+			node.setRemoved();
+			this.size -= 1;
+			this.applyIdleCountAndRebalanceIfNecessary();
+			return BuildNode.of(node.other, node.value);
+		}
+		return null;
+	}
 	@SuppressWarnings("unchecked")
 	@Override
 	public void rebalance() {
 		List<BuildNode<T, TD>> remainingTree = Lists.newArrayList();
 		this.preDfs((o, m) -> remainingTree.add(BuildNode.of(o, m)));
 		assert remainingTree.size() == this.size;
-		this.build(remainingTree.toArray(new BuildNode[0]));
+		this.build(remainingTree.toArray(BuildNode[]::new));
+	}
+
+	@Override
+	public int getDimensionSize() {
+		return this.dimensionSize;
 	}
 }
