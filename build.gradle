@@ -163,6 +163,7 @@ publishing {
             pom {
                 url.set("https://github.com/Viola-Siemens/Tetrachord-Lib.git")
             }
+            artifact sourceJar
         }
     }
 }
