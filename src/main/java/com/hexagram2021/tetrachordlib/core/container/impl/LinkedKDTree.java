@@ -1,9 +1,9 @@
 package com.hexagram2021.tetrachordlib.core.container.impl;
 
+import com.google.common.collect.Lists;
 import com.hexagram2021.tetrachordlib.core.algorithm.Algorithm;
 import com.hexagram2021.tetrachordlib.core.container.IMultidimensional;
 import com.hexagram2021.tetrachordlib.core.container.KDTree;
-import org.apache.commons.compress.utils.Lists;
 
 import javax.annotation.Nullable;
 import java.util.*;

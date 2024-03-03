@@ -1,9 +1,8 @@
 package com.hexagram2021.tetrachordlib.core.container.impl;
 
 import com.hexagram2021.tetrachordlib.core.container.IMultidimensional;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -15,7 +14,6 @@ public class DoublePosition implements IMultidimensional<Double> {
 	}
 
 	@Override
-	@Contract(pure = true)
 	public int getDimensionSize() {
 		return this.dimensions.length;
 	}
@@ -31,7 +29,6 @@ public class DoublePosition implements IMultidimensional<Double> {
 	}
 
 	@Override
-	@Contract(pure = true)
 	public double distanceWith(IMultidimensional<Double> md) {
 		if(this.getDimensionSize() != md.getDimensionSize()) {
 			throw new IllegalArgumentException("This %d-dimension object cannot compare distance with %d-dimension object.".formatted(this.getDimensionSize(), md.getDimensionSize()));
@@ -45,7 +42,6 @@ public class DoublePosition implements IMultidimensional<Double> {
 	}
 
 	@Override
-	@Contract(pure = true)
 	public double lowerboundDistanceWith(IMultidimensional<Double> max, IMultidimensional<Double> min) {
 		if(this.getDimensionSize() != max.getDimensionSize() || this.getDimensionSize() != min.getDimensionSize()) {
 			throw new IllegalArgumentException("This %d-dimension object cannot compare lowerbound distance with hyper-rectangle of %d/%d-dimension.".formatted(this.getDimensionSize(), max.getDimensionSize(), min.getDimensionSize()));
@@ -62,7 +58,6 @@ public class DoublePosition implements IMultidimensional<Double> {
 		return Math.sqrt(ret);
 	}
 	@Override
-	@Contract(pure = true)
 	public double upperboundDistanceWith(IMultidimensional<Double> max, IMultidimensional<Double> min) {
 		if(this.getDimensionSize() != max.getDimensionSize() || this.getDimensionSize() != min.getDimensionSize()) {
 			throw new IllegalArgumentException("This %d-dimension object cannot compare upperbound distance with hyper-rectangle of %d/%d-dimension.".formatted(this.getDimensionSize(), max.getDimensionSize(), min.getDimensionSize()));
@@ -89,7 +84,6 @@ public class DoublePosition implements IMultidimensional<Double> {
 		return new DoublePosition(this.dimensions);
 	}
 	@Override
-	@Contract(value = "null -> false", pure = true)
 	public boolean equals(@Nullable Object obj) {
 		if(obj instanceof DoublePosition md && this.getDimensionSize() == md.getDimensionSize()) {
 			for (int i = 0; i < this.getDimensionSize(); ++i) {
@@ -102,13 +96,11 @@ public class DoublePosition implements IMultidimensional<Double> {
 		return false;
 	}
 	@Override
-	@Contract(pure = true)
 	public int hashCode() {
 		return Arrays.hashCode(this.dimensions);
 	}
 
 	@Override
-	@Contract(pure = true)
 	public DoublePosition add(IMultidimensional<Double> other) {
 		DoublePosition ret = new DoublePosition(this.dimensions);
 		for(int i = 0; i < ret.dimensions.length; ++i) {
@@ -117,7 +109,6 @@ public class DoublePosition implements IMultidimensional<Double> {
 		return ret;
 	}
 	@Override
-	@Contract(pure = true)
 	public DoublePosition minus(IMultidimensional<Double> other) {
 		DoublePosition ret = new DoublePosition(this.dimensions);
 		for(int i = 0; i < ret.dimensions.length; ++i) {
@@ -126,7 +117,6 @@ public class DoublePosition implements IMultidimensional<Double> {
 		return ret;
 	}
 	@Override
-	@Contract(pure = true)
 	public DoublePosition hadamard(IMultidimensional<Double> other) {
 		DoublePosition ret = new DoublePosition(this.dimensions);
 		for(int i = 0; i < ret.dimensions.length; ++i) {
@@ -135,7 +125,6 @@ public class DoublePosition implements IMultidimensional<Double> {
 		return ret;
 	}
 	@Override
-	@Contract(pure = true)
 	public Double dot(IMultidimensional<Double> other) {
 		double ret = 0;
 		for(int i = 0; i < this.dimensions.length; ++i) {
@@ -144,7 +133,6 @@ public class DoublePosition implements IMultidimensional<Double> {
 		return ret;
 	}
 	@Override
-	@Contract(pure = true)
 	public DoublePosition multiply(Double multiplier) {
 		DoublePosition ret = new DoublePosition(this.dimensions);
 		for(int i = 0; i < ret.dimensions.length; ++i) {
@@ -153,7 +141,6 @@ public class DoublePosition implements IMultidimensional<Double> {
 		return ret;
 	}
 	@Override
-	@Contract(pure = true)
 	public DoublePosition divide(double divider) {
 		DoublePosition ret = new DoublePosition(this.dimensions);
 		for(int i = 0; i < ret.dimensions.length; ++i) {
@@ -162,7 +149,6 @@ public class DoublePosition implements IMultidimensional<Double> {
 		return ret;
 	}
 	@Override
-	@Contract(pure = true)
 	public DoublePosition asDouble() {
 		return this.clone();
 	}

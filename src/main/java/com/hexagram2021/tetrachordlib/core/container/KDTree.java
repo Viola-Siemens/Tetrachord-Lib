@@ -3,8 +3,6 @@ package com.hexagram2021.tetrachordlib.core.container;
 import com.google.common.collect.Queues;
 import com.google.common.util.concurrent.AtomicDouble;
 import com.hexagram2021.tetrachordlib.core.container.impl.LinkedKDTree;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Contract;
 
 import javax.annotation.Nullable;
 import java.util.Comparator;
@@ -213,7 +211,6 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 		}
 	}
 
-	@ApiStatus.Internal
 	static <T, TD extends Comparable<TD>> void preDfs(KDNode<T, TD> kdn, IVisitFunction.Binary<T, IMultidimensional<TD>> visitFunction) {
 		if(!kdn.removed()) {
 			kdn.visit(visitFunction);
@@ -228,7 +225,6 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 			preDfs(rc, visitFunction);
 		}
 	}
-	@ApiStatus.Internal
 	static <T, TD extends Comparable<TD>> void inDfs(KDNode<T, TD> kdn, IVisitFunction.Binary<T, IMultidimensional<TD>> visitFunction) {
 		KDNode<T, TD> lc = kdn.leftChild();
 		KDNode<T, TD> rc = kdn.rightChild();
@@ -244,7 +240,6 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 			inDfs(rc, visitFunction);
 		}
 	}
-	@ApiStatus.Internal
 	static <T, TD extends Comparable<TD>> void postDfs(KDNode<T, TD> kdn, IVisitFunction.Binary<T, IMultidimensional<TD>> visitFunction) {
 		KDNode<T, TD> lc = kdn.leftChild();
 		KDNode<T, TD> rc = kdn.rightChild();
@@ -260,7 +255,6 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 		}
 	}
 
-	@ApiStatus.Internal
 	static <T, TD extends Comparable<TD>> void preDfs(KDNode<T, TD> kdn, IVisitFunction.Simple<KDNode<T, TD>> visitFunction) {
 		if(!kdn.removed()) {
 			visitFunction.visit(kdn);
@@ -275,7 +269,6 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 			preDfs(rc, visitFunction);
 		}
 	}
-	@ApiStatus.Internal
 	static <T, TD extends Comparable<TD>> void inDfs(KDNode<T, TD> kdn, IVisitFunction.Simple<KDNode<T, TD>> visitFunction) {
 		KDNode<T, TD> lc = kdn.leftChild();
 		KDNode<T, TD> rc = kdn.rightChild();
@@ -291,7 +284,6 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 			inDfs(rc, visitFunction);
 		}
 	}
-	@ApiStatus.Internal
 	static <T, TD extends Comparable<TD>> void postDfs(KDNode<T, TD> kdn, IVisitFunction.Simple<KDNode<T, TD>> visitFunction) {
 		KDNode<T, TD> lc = kdn.leftChild();
 		KDNode<T, TD> rc = kdn.rightChild();
@@ -358,7 +350,6 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 		}
 	}
 
-	@Contract(pure = true)
 	default Comparator<IMultidimensional<TD>> getComparator(int dimension) {
 		Comparator<IMultidimensional<TD>> ret = Comparator.comparing(md -> md.getDimension(dimension));
 		for(int i = 1; i < this.getDimensionSize(); ++i) {
