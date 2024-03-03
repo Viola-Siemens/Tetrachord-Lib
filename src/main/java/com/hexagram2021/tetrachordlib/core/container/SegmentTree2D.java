@@ -32,7 +32,7 @@ public interface SegmentTree2D<T> {
 
 	IEditRule<T> getEditRule();
 
-	int sideSize();
+	int sideSize(int dimension);
 	int totalSize();
 
 	void visit(int beginX, int endX, int beginY, int endY, VisitConsumer<T> consumer);

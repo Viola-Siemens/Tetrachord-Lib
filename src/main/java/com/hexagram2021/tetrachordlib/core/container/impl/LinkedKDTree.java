@@ -23,17 +23,20 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 		private final IMultidimensional<TD> min;
 		private boolean removed = false;
 
-		public LinkedKDNode(IMultidimensional<TD> value, T other) {
+		private int subtreeSize;
+
+		LinkedKDNode(IMultidimensional<TD> value, T other) {
 			this.value = value;
 			this.max = value.clone();
 			this.min = value.clone();
 			this.other = other;
+			this.subtreeSize = 1;
 		}
-		public LinkedKDNode(IMultidimensional<TD> value, T other, @Nullable LinkedKDNode ftr) {
+		LinkedKDNode(IMultidimensional<TD> value, T other, @Nullable LinkedKDNode ftr) {
 			this(value, other);
 			this.ftr = ftr;
 		}
-		public LinkedKDNode(IMultidimensional<TD> value, T other, @Nullable LinkedKDNode ftr, @Nullable LinkedKDNode lc, @Nullable LinkedKDNode rc) {
+		LinkedKDNode(IMultidimensional<TD> value, T other, @Nullable LinkedKDNode ftr, @Nullable LinkedKDNode lc, @Nullable LinkedKDNode rc) {
 			this(value, other, ftr);
 			this.lc = lc;
 			this.rc = rc;
@@ -60,6 +63,51 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 		@Override
 		public double upperboundDistanceWith(IMultidimensional<TD> md) {
 			return md.upperboundDistanceWith(this.max, this.min);
+		}
+
+		public int getSubtreeSize() {
+			return this.subtreeSize;
+		}
+
+		/**
+		 * Maintain subtreeSize and check if the tree is unbalanced.
+		 * If multiple nodes are unbalanced, rebuild will only happen at the shallowest (from root to leaves) unbalanced node.
+		 * @param edit		Insert: 1; Remove: -1.
+		 * @return			-1 if no need to rebalance. sepDim of this node otherwise.
+		 */
+		@SuppressWarnings("unchecked")
+		private int editSubtreeSizeAndRebuildIfUnbalanced(int edit) {
+			this.subtreeSize += edit;
+			if(this.ftr == null) {
+				double threshold = this.subtreeSize * LinkedKDTree.this.alpha;
+				if(threshold > 6 && ((this.lc != null && this.lc.subtreeSize > threshold) || (this.rc != null && this.rc.subtreeSize > threshold))) {
+					//rebalance the entire tree
+					LinkedKDTree.this.rebalance();
+					return -1;
+				}
+				return (LinkedKDTree.this.sepDim() + 1) % LinkedKDTree.this.getDimensionSize();
+			}
+			int sepDim = this.ftr.editSubtreeSizeAndRebuildIfUnbalanced(edit);
+			if(sepDim < 0) {
+				return sepDim;
+			}
+			double threshold = this.subtreeSize * LinkedKDTree.this.alpha;
+			LinkedKDTree.this.hot = this.ftr;
+			if(threshold > 6 && ((this.lc != null && this.lc.subtreeSize > threshold) || (this.rc != null && this.rc.subtreeSize > threshold))) {
+				//rebalance subtree
+				List<BuildNode<T, TD>> remainingTree = Lists.newArrayList();
+				KDTree.inDfs(this, (o, m) -> remainingTree.add(BuildNode.of(o, m)));
+				assert remainingTree.size() == this.subtreeSize;
+				LinkedKDNode rebuildSubtree = LinkedKDTree.this.build(remainingTree.toArray(BuildNode[]::new), 0, remainingTree.size(), sepDim);
+				if(this.ftr.lc == this) {
+					this.ftr.lc = rebuildSubtree;
+				} else {
+					assert this.ftr.rc == this;
+					this.ftr.rc = rebuildSubtree;
+				}
+				return -1;
+			}
+			return (sepDim + 1) % LinkedKDTree.this.getDimensionSize();
 		}
 
 		@Override
@@ -124,8 +172,8 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 
 		@Override
 		public void maintain() {
+			this.subtreeSize = 1;
 			if(this.lc != null) {
-				this.lc.maintain();
 				for(int i = 0; i < this.value.getDimensionSize(); ++i) {
 					if(this.max.getDimension(i).compareTo(this.lc.max.getDimension(i)) < 0) {
 						this.max.setDimension(i, this.lc.max.getDimension(i));
@@ -134,9 +182,9 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 						this.min.setDimension(i, this.lc.min.getDimension(i));
 					}
 				}
+				this.subtreeSize += this.lc.subtreeSize;
 			}
 			if(this.rc != null) {
-				this.rc.maintain();
 				for(int i = 0; i < this.value.getDimensionSize(); ++i) {
 					if(this.max.getDimension(i).compareTo(this.rc.max.getDimension(i)) < 0) {
 						this.max.setDimension(i, this.rc.max.getDimension(i));
@@ -145,6 +193,7 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 						this.min.setDimension(i, this.rc.min.getDimension(i));
 					}
 				}
+				this.subtreeSize += this.rc.subtreeSize;
 			}
 		}
 
@@ -219,25 +268,10 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 	private int size = 0;
 	private int sepDim = 0;
 
+	private double alpha = 0.6875;
+
 	public LinkedKDTree(int dimensionSize) {
 		this.dimensionSize = dimensionSize;
-	}
-
-	private transient int idleCount = 0;
-	private void applyIdleCountAndRebalanceIfNecessary() {
-		if(this.size == 0) {
-			this.idleCount = 0;
-			this.clear();
-			return;
-		}
-		this.idleCount += 1;
-		if(this.idleCount < 16) {
-			return;
-		}
-		if(this.size / this.idleCount < 4) {
-			this.rebalance();
-			this.idleCount = 0;
-		}
 	}
 
 	@Nullable
@@ -295,9 +329,8 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 		this.hotSepDim = 0;
 	}
 
-	private LinkedKDNode build(BuildNode<T, TD>[] buildNodes, int beg, int end, int depth) {
+	private LinkedKDNode build(BuildNode<T, TD>[] buildNodes, int beg, int end, int dimension) {
 		int nodeCount = end - beg;
-		int dimension = (this.sepDim + depth) % this.dimensionSize;
 		int kth = nodeCount / 2;
 		Algorithm.quickSelect(
 				buildNodes, beg, end, kth, Comparator.comparing(BuildNode::value, this.getComparator(dimension))
@@ -306,12 +339,13 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 		LinkedKDNode ret = new LinkedKDNode(bn.value(), bn.other(), this.hot);
 		if(nodeCount > 1) {
 			this.hot = ret;
-			ret.lc = this.build(buildNodes, beg, beg + kth, depth + 1);
+			ret.lc = this.build(buildNodes, beg, beg + kth, (dimension + 1) % this.dimensionSize);
 			if (nodeCount > 2) {
 				this.hot = ret;
-				ret.rc = this.build(buildNodes, beg + kth + 1, end, depth + 1);
+				ret.rc = this.build(buildNodes, beg + kth + 1, end, (dimension + 1) % this.dimensionSize);
 			}
 		}
+		ret.maintain();
 		return ret;
 	}
 
@@ -330,8 +364,7 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 					this.sepDim = j;
 				}
 			}
-			this.root = this.build(buildNodes, 0, buildNodes.length, 0);
-			Objects.requireNonNull(this.root).maintain();
+			this.root = this.build(buildNodes, 0, buildNodes.length, this.sepDim);
 		}
 	}
 
@@ -349,6 +382,7 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 			if(kdn.removed()) {
 				kdn.setRemoved(false);
 				this.size += 1;
+				kdn.editSubtreeSizeAndRebuildIfUnbalanced(1);
 			}
 			return kdn;
 		}
@@ -360,7 +394,7 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 		}
 		this.size += 1;
 		kdn.pushUp();
-		this.applyIdleCountAndRebalanceIfNecessary();
+		this.hot.editSubtreeSizeAndRebuildIfUnbalanced(1);
 		return kdn;
 	}
 	@Override @Nullable
@@ -371,7 +405,7 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 		}
 		kdn.setRemoved();
 		this.size -= 1;
-		this.applyIdleCountAndRebalanceIfNecessary();
+		kdn.editSubtreeSizeAndRebuildIfUnbalanced(-1);
 		return BuildNode.of(kdn.other, kdn.value);
 	}
 	@Override @Nullable
@@ -379,7 +413,7 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 		if(kdn instanceof LinkedKDNode node && !kdn.removed()) {
 			node.setRemoved();
 			this.size -= 1;
-			this.applyIdleCountAndRebalanceIfNecessary();
+			node.editSubtreeSizeAndRebuildIfUnbalanced(-1);
 			return BuildNode.of(node.other, node.value);
 		}
 		return null;
@@ -388,7 +422,7 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 	@Override
 	public void rebalance() {
 		List<BuildNode<T, TD>> remainingTree = Lists.newArrayList();
-		this.preDfs((o, m) -> remainingTree.add(BuildNode.of(o, m)));
+		this.inDfs((o, m) -> remainingTree.add(BuildNode.of(o, m)));
 		assert remainingTree.size() == this.size;
 		this.build(remainingTree.toArray(BuildNode[]::new));
 	}
@@ -396,5 +430,14 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 	@Override
 	public int getDimensionSize() {
 		return this.dimensionSize;
+	}
+
+	@Override
+	public double getAlpha() {
+		return this.alpha;
+	}
+	@Override
+	public void setAlpha(double alpha) {
+		this.alpha = alpha;
 	}
 }
