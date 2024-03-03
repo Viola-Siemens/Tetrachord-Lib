@@ -63,4 +63,8 @@ public interface IEditRule<T> {
 	 */
 	@Contract(pure = true) @Nullable
 	T update(@Nullable T old, @Nullable T delta);
+	@Contract(pure = true)
+	default T subtract(T left, T right) {
+		throw new UnsupportedOperationException("Subtraction is not implemented.");
+	}
 }

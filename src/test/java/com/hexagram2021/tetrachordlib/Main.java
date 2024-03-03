@@ -5,16 +5,14 @@ import com.hexagram2021.tetrachordlib.core.algorithm.Algorithm;
 import com.hexagram2021.tetrachordlib.core.container.IMultidimensional;
 import com.hexagram2021.tetrachordlib.core.container.KDTree;
 import com.hexagram2021.tetrachordlib.core.container.SegmentTree2D;
-import com.hexagram2021.tetrachordlib.core.container.impl.DoublePosition;
-import com.hexagram2021.tetrachordlib.core.container.impl.EditRules;
-import com.hexagram2021.tetrachordlib.core.container.impl.IntPosition;
-import com.hexagram2021.tetrachordlib.core.container.impl.LinkedKDTree;
+import com.hexagram2021.tetrachordlib.core.container.impl.*;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Main {
 	private static final String FOLDER = "src/test/java/com/hexagram2021/tetrachordlib/";
@@ -30,6 +28,8 @@ public class Main {
 		String OP;
 		int W, H;
 		java.util.Scanner in = new java.util.Scanner(new FileInputStream(FOLDER + "st.in"));
+		java.util.Scanner out = new java.util.Scanner(new FileInputStream(FOLDER + "st.out"));
+		boolean failed = false;
 		in.next();
 		W = in.nextInt();
 		H = in.nextInt();
@@ -47,19 +47,24 @@ public class Main {
 					st.edit(delta, x1, x2, y1, y2);
 					break;
 				case "k":
-					System.out.println(st.query(x1, x2, y1, y2));
+					int output = st.query(x1, x2, y1, y2);
+					if(output != out.nextInt()) {
+						failed = true;
+					}
 					break;
 				default:
 					return;
 			}
 		}
+		System.out.print("Test Case (Segment Tree): ");
+		System.out.println(failed ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
 	}
 
 	private static void testSegmentTree() {
 		//Simulate Players' Behavior
 		int[][] array = new int[1024][1024];
 		SegmentTree2D<Integer> st = SegmentTree2D.newArrayQuadSegmentTree2D(1024, EditRules.Integer.sumAdd(), Integer[]::new);
-		boolean fail = false;
+		boolean failed = false;
 		for(int i = 0; i < 4096; ++i) {
 			int beginX = Algorithm.randInt(0, 1023);
 			int endX = Algorithm.randInt(beginX + 1, 1024);
@@ -78,7 +83,7 @@ public class Main {
 				}
 				if(ans != output) {
 					System.out.printf("Wrong output! Expect: %d. Found: %d.\n", ans, output);
-					fail = true;
+					failed = true;
 				}
 			} else {
 				int a = Algorithm.randInt(-8, 8);
@@ -94,7 +99,7 @@ public class Main {
 			}
 		}
 		System.out.print("Test Segment Tree: ");
-		System.out.println(fail ? "TEST FAILED!!!" : "TEST PASSED.");
+		System.out.println(failed ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
 	}
 
 	private static void testKDTree1() throws FileNotFoundException {
@@ -102,6 +107,7 @@ public class Main {
 
 		KDTree<Integer, Double> kdt = KDTree.newLinkedKDTree(2);
 		java.util.Scanner in = new java.util.Scanner(new FileInputStream(FOLDER + "kdt.in"));
+		java.util.Scanner out = new java.util.Scanner(new FileInputStream(FOLDER + "kdt.out"));
 		@SuppressWarnings("unchecked")
 		KDTree.BuildNode<Integer, Double>[] buildNodes = new KDTree.BuildNode[in.nextInt()];
 		for(int i = 0; i < buildNodes.length; ++i) {
@@ -130,12 +136,16 @@ public class Main {
 			}
 			kdt.insert(list.get(i));
 		}
-		System.out.printf("%.2f %.2f\n", nearest, farthest);
+		System.out.print("Test Case (KD Tree 2): ");
+		boolean failed = !"%.2f".formatted(nearest).equals(out.next());
+		failed |= !"%.2f".formatted(farthest).equals(out.next());
+		System.out.println(failed ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
 	}
 
 	private static void testKDTree2() throws FileNotFoundException {
 		KDTree<Integer, Integer> kdt = KDTree.newLinkedKDTree(2);
 		java.util.Scanner in = new java.util.Scanner(new FileInputStream(FOLDER + "kdt.in"));
+		java.util.Scanner out = new java.util.Scanner(new FileInputStream(FOLDER + "kdt.out"));
 		@SuppressWarnings("unchecked")
 		KDTree.BuildNode<Integer, Integer>[] buildNodes = new KDTree.BuildNode[in.nextInt()];
 		for(int i = 0; i < buildNodes.length; ++i) {
@@ -162,7 +172,10 @@ public class Main {
 				farthest = dist;
 			}
 		}
-		System.out.printf("%.2f %.2f\n", nearest, farthest);
+		System.out.print("Test Case (KD Tree 1): ");
+		boolean failed = !"%.2f".formatted(nearest).equals(out.next());
+		failed |= !"%.2f".formatted(farthest).equals(out.next());
+		System.out.println(failed ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -177,7 +190,7 @@ public class Main {
 		KDTree<Integer, Integer> kdt = KDTree.newLinkedKDTree(3);
 		kdt.build(Arrays.stream(arr).map(p -> new KDTree.BuildNode<>(p, Algorithm.randInt(-1024, 0))).toArray(KDTree.BuildNode[]::new));
 		int cnt = 0;
-		boolean fail = false;
+		boolean failed = false;
 		for(int i = 0; i < 16384; ++i) {
 			int a = Algorithm.randInt(0, 10000);
 			if(a < list.size()) {
@@ -203,7 +216,7 @@ public class Main {
 					}
 					if(Math.abs(ans - output) > 1e-6) {
 						System.out.printf("Wrong output! Expect: %f. Found: %f.\n", ans, output);
-						fail = true;
+						failed = true;
 					}
 				} else {
 					if(!list.contains(position)) {
@@ -218,7 +231,7 @@ public class Main {
 			}
 		}
 		System.out.print("Test KD Tree: ");
-		System.out.println(fail ? "TEST FAILED!!!" : "TEST PASSED.");
+		System.out.println(failed ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -271,7 +284,7 @@ public class Main {
 				}
 			}
 		}
-		System.out.println("Test KD Tree Maintainability: TEST PASSED.");
+		System.out.println("Test KD Tree Maintainability: \033[32mTEST PASSED.\033[0m");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -374,6 +387,51 @@ public class Main {
 		System.out.printf("\tinsert: %dms, remove: %dms, query: %dms\n", insert, remove, query);
 	}
 
+	private static void testFenwickTree1D() throws FileNotFoundException {
+		//https://www.luogu.com.cn/problem/P3374
+
+		int n, m, op, x, y;
+		AtomicBoolean failed = new AtomicBoolean(false);
+		java.util.Scanner in = new java.util.Scanner(new FileInputStream(FOLDER + "ft.in"));
+		java.util.Scanner out = new java.util.Scanner(new FileInputStream(FOLDER + "ft.out"));
+		n = in.nextInt();
+		m = in.nextInt();
+		Integer[] arr = new Integer[n];
+		for(int i = 0; i < n; ++i) {
+			arr[i] = in.nextInt();
+		}
+		ArrayFenwickTree1D<Integer> ft = new ArrayFenwickTree1D<>(arr, EditRules.Integer.sumAdd(), Integer[]::new);
+		for(int i = 0; i < m; ++i) {
+			op = in.nextInt();
+			x = in.nextInt();
+			y = in.nextInt();
+			switch(op) {
+				case 1:
+					ft.edit(y, x - 1);
+					break;
+				case 2:
+					int output = ft.query(x - 1, y);
+					int ans = out.nextInt();
+					if(output != ans) {
+						System.out.printf("Wrong output! Expect: %d. Found: %d.\n", ans, output);
+						failed.set(true);
+					}
+					break;
+				default:
+					break;
+			}
+		}
+		ft.visit(n, i -> {
+			int ans = out.nextInt();
+			if(i != ans) {
+				System.out.printf("Wrong output! Expect: %d. Found: %d.\n", ans, i);
+				failed.set(true);
+			}
+		});
+		System.out.print("Test Fenwick Tree: ");
+		System.out.println(failed.get() ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
+	}
+
 	@SuppressWarnings("CallToPrintStackTrace")
 	public static void main(String[] args) {
 		Algorithm.setSeed(42);
@@ -385,6 +443,7 @@ public class Main {
 			testKDTreeTime();
 			testSegmentTree1();
 			testSegmentTree();
+			testFenwickTree1D();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
