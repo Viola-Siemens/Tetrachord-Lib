@@ -149,7 +149,7 @@ public class ArraySegmentTree1D<T> implements SegmentTree1D<T> {
 	public ArraySegmentTree1D(int length, IEditRule<T> editRule, Int2ObjectFunction<T[]> sizedArray) {
 		this.editRule = editRule;
 		if(length <= 0) {
-			throw new IllegalArgumentException("Cannot build a segment tree with length %d.".formatted(length));
+			throw new IllegalArgumentException(String.format("Cannot build a segment tree with length %d.", length));
 		}
 		int hb = Algorithm.highbit(length);
 		this.size = hb << 1;
@@ -172,7 +172,7 @@ public class ArraySegmentTree1D<T> implements SegmentTree1D<T> {
 	@Override
 	public void edit(T delta, int begin, int end) {
 		if(begin < 0 || end >= this.size || begin >= end) {
-			throw new IllegalArgumentException("Cannot edit segment [%d, %d) from %d-sized segment tree.".formatted(begin, end, this.size));
+			throw new IllegalArgumentException(String.format("Cannot edit segment [%d, %d) from %d-sized segment tree.", begin, end, this.size));
 		}
 		this.edit(delta, 0, 0, this.size, begin, end);
 	}
@@ -180,7 +180,7 @@ public class ArraySegmentTree1D<T> implements SegmentTree1D<T> {
 	@Override
 	public T query(int begin, int end) {
 		if(begin < 0 || end >= this.size || begin >= end) {
-			throw new IllegalArgumentException("Cannot query segment [%d, %d) from %d-sized segment tree.".formatted(begin, end, this.size));
+			throw new IllegalArgumentException(String.format("Cannot query segment [%d, %d) from %d-sized segment tree.", begin, end, this.size));
 		}
 		return this.query(0, 0, this.size, begin, end);
 	}

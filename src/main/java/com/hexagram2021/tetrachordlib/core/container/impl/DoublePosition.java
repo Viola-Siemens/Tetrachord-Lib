@@ -31,7 +31,7 @@ public class DoublePosition implements IMultidimensional<Double> {
 	@Override
 	public double distanceWith(IMultidimensional<Double> md) {
 		if(this.getDimensionSize() != md.getDimensionSize()) {
-			throw new IllegalArgumentException("This %d-dimension object cannot compare distance with %d-dimension object.".formatted(this.getDimensionSize(), md.getDimensionSize()));
+			throw new IllegalArgumentException(String.format("This %d-dimension object cannot compare distance with %d-dimension object.", this.getDimensionSize(), md.getDimensionSize()));
 		}
 		double ret = 0;
 		for(int i = 0; i < this.getDimensionSize(); ++i) {
@@ -44,7 +44,7 @@ public class DoublePosition implements IMultidimensional<Double> {
 	@Override
 	public double lowerboundDistanceWith(IMultidimensional<Double> max, IMultidimensional<Double> min) {
 		if(this.getDimensionSize() != max.getDimensionSize() || this.getDimensionSize() != min.getDimensionSize()) {
-			throw new IllegalArgumentException("This %d-dimension object cannot compare lowerbound distance with hyper-rectangle of %d/%d-dimension.".formatted(this.getDimensionSize(), max.getDimensionSize(), min.getDimensionSize()));
+			throw new IllegalArgumentException(String.format("This %d-dimension object cannot compare lowerbound distance with hyper-rectangle of %d/%d-dimension.", this.getDimensionSize(), max.getDimensionSize(), min.getDimensionSize()));
 		}
 		double ret = 0;
 		for(int i = 0; i < this.getDimensionSize(); ++i) {
@@ -60,7 +60,7 @@ public class DoublePosition implements IMultidimensional<Double> {
 	@Override
 	public double upperboundDistanceWith(IMultidimensional<Double> max, IMultidimensional<Double> min) {
 		if(this.getDimensionSize() != max.getDimensionSize() || this.getDimensionSize() != min.getDimensionSize()) {
-			throw new IllegalArgumentException("This %d-dimension object cannot compare upperbound distance with hyper-rectangle of %d/%d-dimension.".formatted(this.getDimensionSize(), max.getDimensionSize(), min.getDimensionSize()));
+			throw new IllegalArgumentException(String.format("This %d-dimension object cannot compare upperbound distance with hyper-rectangle of %d/%d-dimension.", this.getDimensionSize(), max.getDimensionSize(), min.getDimensionSize()));
 		}
 		double ret = 0;
 		for(int i = 0; i < this.getDimensionSize(); ++i) {
@@ -85,13 +85,16 @@ public class DoublePosition implements IMultidimensional<Double> {
 	}
 	@Override
 	public boolean equals(@Nullable Object obj) {
-		if(obj instanceof DoublePosition md && this.getDimensionSize() == md.getDimensionSize()) {
-			for (int i = 0; i < this.getDimensionSize(); ++i) {
-				if(this.dimensions[i] != md.getDimension(i)) {
-					return false;
+		if(obj instanceof DoublePosition) {
+			DoublePosition md = (DoublePosition)obj;
+			if (this.getDimensionSize() == md.getDimensionSize()) {
+				for (int i = 0; i < this.getDimensionSize(); ++i) {
+					if (this.dimensions[i] != md.getDimension(i)) {
+						return false;
+					}
 				}
+				return true;
 			}
-			return true;
 		}
 		return false;
 	}

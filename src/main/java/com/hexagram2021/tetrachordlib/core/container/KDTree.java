@@ -17,7 +17,10 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public interface KDTree<T, TD extends Comparable<TD>> {
-	record BuildNode<T, TD extends Comparable<TD>>(IMultidimensional<TD> value, T other) {
+	class BuildNode<T, TD extends Comparable<TD>> {
+		private final IMultidimensional<TD> value;
+		private final T other;
+
 		public BuildNode(IMultidimensional<TD> value, T other) {
 			this.value = value.clone();
 			this.other = other;
@@ -29,9 +32,14 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 			return new BuildNode<>(this.value, this.other);
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public boolean equals(Object obj) {
-			return obj instanceof KDTree.BuildNode<?, ?> bn && this.value.equals(bn.value) && this.other.equals(bn.other);
+			if(obj instanceof KDTree.BuildNode) {
+				BuildNode<T, TD> bn = (BuildNode<T, TD>) obj;
+				return this.value.equals(bn.value) && this.other.equals(bn.other);
+			}
+			return false;
 		}
 		@Override
 		public int hashCode() {
@@ -40,6 +48,13 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 
 		public static <T, TD extends Comparable<TD>> BuildNode<T, TD> of(T other, IMultidimensional<TD> val) {
 			return new BuildNode<>(val, other);
+		}
+
+		public IMultidimensional<TD> value() {
+			return this.value;
+		}
+		public T other() {
+			return this.other;
 		}
 	}
 
@@ -299,7 +314,7 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 		}
 	}
 
-	private static <T, TD extends Comparable<TD>> void searchForClosest(KDNode<T, TD> kdn, IMultidimensional<TD> target,
+	static <T, TD extends Comparable<TD>> void searchForClosest(KDNode<T, TD> kdn, IMultidimensional<TD> target,
 																		AtomicDouble dist, AtomicReference<KDNode<T, TD>> answer) {
 		KDNode<T, TD> lc = kdn.leftChild();
 		KDNode<T, TD> rc = kdn.rightChild();
@@ -324,7 +339,7 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 			}
 		}
 	}
-	private static <T, TD extends Comparable<TD>> void searchForFarthest(KDNode<T, TD> kdn, IMultidimensional<TD> target,
+	static <T, TD extends Comparable<TD>> void searchForFarthest(KDNode<T, TD> kdn, IMultidimensional<TD> target,
 																		 AtomicDouble dist, AtomicReference<KDNode<T, TD>> answer) {
 		KDNode<T, TD> lc = kdn.leftChild();
 		KDNode<T, TD> rc = kdn.rightChild();

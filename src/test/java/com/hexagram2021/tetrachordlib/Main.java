@@ -7,8 +7,10 @@ import com.hexagram2021.tetrachordlib.core.container.KDTree;
 import com.hexagram2021.tetrachordlib.core.container.SegmentTree2D;
 import com.hexagram2021.tetrachordlib.core.container.impl.*;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -16,19 +18,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Main {
 	private static final String FOLDER = "src/test/java/com/hexagram2021/tetrachordlib/";
+	private static final DecimalFormat FORMAT = new DecimalFormat("0.00");
 
 	private static final boolean LOG_DETAIL = false;
 
 	private static final int XZBound = 1024;
 	private static final int YBound = 32;
 
-	private static void testSegmentTree1() throws FileNotFoundException {
+	private static void testSegmentTree1() throws IOException {
 		//https://www.luogu.com.cn/problem/P4514
 
 		String OP;
 		int W, H;
-		java.util.Scanner in = new java.util.Scanner(new FileInputStream(FOLDER + "st.in"));
-		java.util.Scanner out = new java.util.Scanner(new FileInputStream(FOLDER + "st.out"));
+		java.util.Scanner in = new java.util.Scanner(Files.newInputStream(Paths.get(FOLDER + "st.in")));
+		java.util.Scanner out = new java.util.Scanner(Files.newInputStream(Paths.get(FOLDER + "st.out")));
 		boolean failed = false;
 		in.next();
 		W = in.nextInt();
@@ -102,12 +105,12 @@ public class Main {
 		System.out.println(failed ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
 	}
 
-	private static void testKDTree1() throws FileNotFoundException {
+	private static void testKDTree1() throws IOException {
 		//https://www.luogu.com.cn/problem/P6247
 
 		KDTree<Integer, Double> kdt = KDTree.newLinkedKDTree(2);
-		java.util.Scanner in = new java.util.Scanner(new FileInputStream(FOLDER + "kdt.in"));
-		java.util.Scanner out = new java.util.Scanner(new FileInputStream(FOLDER + "kdt.out"));
+		java.util.Scanner in = new java.util.Scanner(Files.newInputStream(Paths.get(FOLDER + "kdt.in")));
+		java.util.Scanner out = new java.util.Scanner(Files.newInputStream(Paths.get(FOLDER + "kdt.out")));
 		@SuppressWarnings("unchecked")
 		KDTree.BuildNode<Integer, Double>[] buildNodes = new KDTree.BuildNode[in.nextInt()];
 		for(int i = 0; i < buildNodes.length; ++i) {
@@ -137,15 +140,15 @@ public class Main {
 			kdt.insert(list.get(i));
 		}
 		System.out.print("Test Case (KD Tree 2): ");
-		boolean failed = !"%.2f".formatted(nearest).equals(out.next());
-		failed |= !"%.2f".formatted(farthest).equals(out.next());
+		boolean failed = !FORMAT.format(nearest).equals(out.next());
+		failed |= !FORMAT.format(farthest).equals(out.next());
 		System.out.println(failed ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
 	}
 
-	private static void testKDTree2() throws FileNotFoundException {
+	private static void testKDTree2() throws IOException {
 		KDTree<Integer, Integer> kdt = KDTree.newLinkedKDTree(2);
-		java.util.Scanner in = new java.util.Scanner(new FileInputStream(FOLDER + "kdt.in"));
-		java.util.Scanner out = new java.util.Scanner(new FileInputStream(FOLDER + "kdt.out"));
+		java.util.Scanner in = new java.util.Scanner(Files.newInputStream(Paths.get(FOLDER + "kdt.in")));
+		java.util.Scanner out = new java.util.Scanner(Files.newInputStream(Paths.get(FOLDER + "kdt.out")));
 		@SuppressWarnings("unchecked")
 		KDTree.BuildNode<Integer, Integer>[] buildNodes = new KDTree.BuildNode[in.nextInt()];
 		for(int i = 0; i < buildNodes.length; ++i) {
@@ -173,8 +176,8 @@ public class Main {
 			}
 		}
 		System.out.print("Test Case (KD Tree 1): ");
-		boolean failed = !"%.2f".formatted(nearest).equals(out.next());
-		failed |= !"%.2f".formatted(farthest).equals(out.next());
+		boolean failed = !FORMAT.format(nearest).equals(out.next());
+		failed |= !FORMAT.format(farthest).equals(out.next());
 		System.out.println(failed ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
 	}
 
@@ -204,10 +207,10 @@ public class Main {
 				if((a & 0x1) != 0 && !list.isEmpty()) {
 					double ans, output;
 					if(Algorithm.randBool()) {
-						ans = list.stream().mapToDouble(md -> md.distanceWith(position)).min().orElseThrow();
+						ans = list.stream().mapToDouble(md -> md.distanceWith(position)).min().orElseThrow(RuntimeException::new);
 						output = kdt.findClosest(position).distanceWith(position);
 					} else {
-						ans = list.stream().mapToDouble(md -> md.distanceWith(position)).max().orElseThrow();
+						ans = list.stream().mapToDouble(md -> md.distanceWith(position)).max().orElseThrow(RuntimeException::new);
 						output = kdt.findFarthest(position).distanceWith(position);
 					}
 					if(LOG_DETAIL) {
@@ -315,9 +318,9 @@ public class Main {
 					double ans;
 					tmp = System.currentTimeMillis();
 					if(Algorithm.randBool()) {
-						ans = list.stream().mapToDouble(md -> md.distanceWith(position)).min().orElseThrow();
+						ans = list.stream().mapToDouble(md -> md.distanceWith(position)).min().orElseThrow(RuntimeException::new);
 					} else {
-						ans = list.stream().mapToDouble(md -> md.distanceWith(position)).max().orElseThrow();
+						ans = list.stream().mapToDouble(md -> md.distanceWith(position)).max().orElseThrow(RuntimeException::new);
 					}
 					query += System.currentTimeMillis() - tmp;
 					if(LOG_DETAIL) {
@@ -387,13 +390,13 @@ public class Main {
 		System.out.printf("\tinsert: %dms, remove: %dms, query: %dms\n", insert, remove, query);
 	}
 
-	private static void testFenwickTree1D() throws FileNotFoundException {
+	private static void testFenwickTree1D() throws IOException {
 		//https://www.luogu.com.cn/problem/P3374
 
 		int n, m, op, x, y;
 		AtomicBoolean failed = new AtomicBoolean(false);
-		java.util.Scanner in = new java.util.Scanner(new FileInputStream(FOLDER + "ft.in"));
-		java.util.Scanner out = new java.util.Scanner(new FileInputStream(FOLDER + "ft.out"));
+		java.util.Scanner in = new java.util.Scanner(Files.newInputStream(Paths.get(FOLDER + "ft.in")));
+		java.util.Scanner out = new java.util.Scanner(Files.newInputStream(Paths.get(FOLDER + "ft.out")));
 		n = in.nextInt();
 		m = in.nextInt();
 		Integer[] arr = new Integer[n];

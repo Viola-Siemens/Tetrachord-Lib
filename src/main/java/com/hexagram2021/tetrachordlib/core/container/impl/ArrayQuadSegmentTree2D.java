@@ -309,7 +309,7 @@ public class ArrayQuadSegmentTree2D<T> implements SegmentTree2D<T> {
 	public ArrayQuadSegmentTree2D(int length, IEditRule<T> editRule, Int2ObjectFunction<T[]> sizedArray) {
 		this.editRule = editRule;
 		if(length <= 0) {
-			throw new IllegalArgumentException("Cannot build a 2d segment tree with length %d.".formatted(length));
+			throw new IllegalArgumentException(String.format("Cannot build a 2d segment tree with length %d.", length));
 		}
 		int hb = Algorithm.highbit(length);
 		this.size = hb << 1;
@@ -336,10 +336,10 @@ public class ArrayQuadSegmentTree2D<T> implements SegmentTree2D<T> {
 	@Override
 	public void edit(T delta, int beginX, int endX, int beginY, int endY) {
 		if(beginX < 0 || endX >= this.size || beginX >= endX) {
-			throw new IllegalArgumentException("Cannot edit x-axis [%d, %d) from %d-sized 2d segment tree.".formatted(beginX, endX, this.size));
+			throw new IllegalArgumentException(String.format("Cannot edit x-axis [%d, %d) from %d-sized 2d segment tree.", beginX, endX, this.size));
 		}
 		if(beginY < 0 || endY >= this.size || beginY >= endY) {
-			throw new IllegalArgumentException("Cannot edit y-axis [%d, %d) from %d-sized 2d segment tree.".formatted(beginY, endY, this.size));
+			throw new IllegalArgumentException(String.format("Cannot edit y-axis [%d, %d) from %d-sized 2d segment tree.", beginY, endY, this.size));
 		}
 		this.edit(delta, 0, 0, 0, this.size, beginX, endX, beginY, endY);
 	}
@@ -347,10 +347,10 @@ public class ArrayQuadSegmentTree2D<T> implements SegmentTree2D<T> {
 	@Override
 	public T query(int beginX, int endX, int beginY, int endY) {
 		if(beginX < 0 || endX >= this.size || beginX >= endX) {
-			throw new IllegalArgumentException("Cannot query x-axis [%d, %d) from %d-sized 2d segment tree.".formatted(beginX, endX, this.size));
+			throw new IllegalArgumentException(String.format("Cannot query x-axis [%d, %d) from %d-sized 2d segment tree.", beginX, endX, this.size));
 		}
 		if(beginY < 0 || endY >= this.size || beginY >= endY) {
-			throw new IllegalArgumentException("Cannot query y-axis [%d, %d) from %d-sized 2d segment tree.".formatted(beginY, endY, this.size));
+			throw new IllegalArgumentException(String.format("Cannot query y-axis [%d, %d) from %d-sized 2d segment tree.", beginY, endY, this.size));
 		}
 		return this.query(0, 0, 0, this.size, beginX, endX, beginY, endY);
 	}

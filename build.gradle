@@ -17,7 +17,7 @@ plugins {
 }
 apply plugin: 'net.minecraftforge.gradle'
 
-version = '1.17+1.0.2'
+version = '1.16+1.0.2'
 group = 'com.hexagram2021.tetrachordlib'
 
 base {
@@ -25,11 +25,11 @@ base {
 }
 archivesBaseName = 'tetrachordlib'
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(16)
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
-    mappings channel: 'official', version: '1.17.1'
+    mappings channel: 'official', version: '1.16.5'
 
     runs {
         client {
@@ -115,7 +115,7 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.17.1-37.1.1'
+    minecraft 'net.minecraftforge:forge:1.16.5-36.2.34'
 }
 
 jar {

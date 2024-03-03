@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[37,)"
+loaderVersion="[32,)"
 license="LGPL v2.1"
 issueTrackerURL="https://github.com/Viola-Siemens/Tetrachord-Lib/issues"
 
@@ -17,13 +17,13 @@ A lightweight library mod that provides various data structures such as KD Trees
 [[dependencies.tetrachordlib]]
     modId="forge"
     mandatory=true
-    versionRange="[37,)"
+    versionRange="[32,)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.tetrachordlib]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.17,)"
+    versionRange="[1.16,)"
     ordering="NONE"
     side="BOTH"

@@ -6,7 +6,10 @@ import com.hexagram2021.tetrachordlib.core.container.IMultidimensional;
 import com.hexagram2021.tetrachordlib.core.container.KDTree;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 
 @SuppressWarnings("unused")
 public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD> {
@@ -98,7 +101,7 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 				List<BuildNode<T, TD>> remainingTree = Lists.newArrayList();
 				KDTree.inDfs(this, (o, m) -> remainingTree.add(BuildNode.of(o, m)));
 				assert remainingTree.size() == this.subtreeSize;
-				LinkedKDNode rebuildSubtree = LinkedKDTree.this.build(remainingTree.toArray(BuildNode[]::new), 0, remainingTree.size(), sepDim);
+				LinkedKDNode rebuildSubtree = LinkedKDTree.this.build(remainingTree.toArray(new BuildNode[0]), 0, remainingTree.size(), sepDim);
 				if(this.ftr.lc == this) {
 					this.ftr.lc = rebuildSubtree;
 				} else {
@@ -355,8 +358,17 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 		this.size = buildNodes.length;
 
 		if(this.size > 0) {
-			IMultidimensional<Double> mean = Arrays.stream(buildNodes).map(BuildNode::value).reduce(IMultidimensional::add).orElseThrow().divide(this.size);
-			IMultidimensional<Double> var = Arrays.stream(buildNodes).map(bn -> bn.value().asDouble().minus(mean)).map(md -> md.hadamard(md)).reduce(IMultidimensional::add).orElseThrow().divide(this.size);
+			IMultidimensional<Double> mean = Arrays.stream(buildNodes)
+					.map(BuildNode::value)
+					.reduce(IMultidimensional::add)
+					.orElseThrow(RuntimeException::new)
+					.divide(this.size);
+			IMultidimensional<Double> var = Arrays.stream(buildNodes)
+					.map(bn -> bn.value().asDouble().minus(mean))
+					.map(md -> md.hadamard(md))
+					.reduce(IMultidimensional::add)
+					.orElseThrow(RuntimeException::new)
+					.divide(this.size);
 
 			this.sepDim = 0;
 			for(int j = 1; j < this.dimensionSize; ++j) {
@@ -371,7 +383,7 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 	@Override
 	public LinkedKDNode insert(BuildNode<T, TD> buildNode) {
 		assert buildNode.value().getDimensionSize() == this.dimensionSize :
-				"Node with dimension size %d cannot be inserted into this %d-dimension tree.".formatted(buildNode.value().getDimensionSize(), this.dimensionSize);
+				String.format("Node with dimension size %d cannot be inserted into this %d-dimension tree.", buildNode.value().getDimensionSize(), this.dimensionSize);
 		if(this.size == 0) {
 			this.root = new LinkedKDNode(buildNode.value(), buildNode.other());
 			this.size += 1;
@@ -410,7 +422,8 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 	}
 	@Override @Nullable
 	public BuildNode<T, TD> remove(@Nullable KDNode<T, TD> kdn) {
-		if(kdn instanceof LinkedKDNode node && !kdn.removed()) {
+		if(kdn instanceof LinkedKDTree<?, ?>.LinkedKDNode && !kdn.removed()) {
+			LinkedKDNode node = (LinkedKDNode) kdn;
 			node.setRemoved();
 			this.size -= 1;
 			node.editSubtreeSizeAndRebuildIfUnbalanced(-1);
@@ -424,7 +437,7 @@ public class LinkedKDTree<T, TD extends Comparable<TD>> implements KDTree<T, TD>
 		List<BuildNode<T, TD>> remainingTree = Lists.newArrayList();
 		this.inDfs((o, m) -> remainingTree.add(BuildNode.of(o, m)));
 		assert remainingTree.size() == this.size;
-		this.build(remainingTree.toArray(BuildNode[]::new));
+		this.build(remainingTree.toArray(new BuildNode[0]));
 	}
 
 	@Override

@@ -58,7 +58,7 @@ public class ArrayFenwickTree1D<T> implements FenwickTree1D<T> {
 	public ArrayFenwickTree1D(int length, IEditRule<T> editRule, Int2ObjectFunction<T[]> sizedArray) {
 		this.editRule = editRule;
 		if(length <= 0) {
-			throw new IllegalArgumentException("Cannot build a fenwick tree with length %d.".formatted(length));
+			throw new IllegalArgumentException(String.format("Cannot build a fenwick tree with length %d.", length));
 		}
 		int hb = Algorithm.highbit(length - 1);
 		this.size = hb << 1;
