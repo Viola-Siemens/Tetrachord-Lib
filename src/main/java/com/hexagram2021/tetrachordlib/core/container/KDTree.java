@@ -3,6 +3,7 @@ package com.hexagram2021.tetrachordlib.core.container;
 import com.google.common.collect.Queues;
 import com.google.common.util.concurrent.AtomicDouble;
 import com.hexagram2021.tetrachordlib.core.container.impl.LinkedKDTree;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 
 import javax.annotation.Nullable;
@@ -193,8 +194,27 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 			postDfs(root, visitFunction);
 		}
 	}
+	default void preDfs(IVisitFunction.Simple<KDNode<T, TD>> visitFunction) {
+		KDNode<T, TD> root = this.root();
+		if(root != null) {
+			preDfs(root, visitFunction);
+		}
+	}
+	default void inDfs(IVisitFunction.Simple<KDNode<T, TD>> visitFunction) {
+		KDNode<T, TD> root = this.root();
+		if(root != null) {
+			inDfs(root, visitFunction);
+		}
+	}
+	default void postDfs(IVisitFunction.Simple<KDNode<T, TD>> visitFunction) {
+		KDNode<T, TD> root = this.root();
+		if(root != null) {
+			postDfs(root, visitFunction);
+		}
+	}
 
-	private static <T, TD extends Comparable<TD>> void preDfs(KDNode<T, TD> kdn, IVisitFunction.Binary<T, IMultidimensional<TD>> visitFunction) {
+	@ApiStatus.Internal
+	static <T, TD extends Comparable<TD>> void preDfs(KDNode<T, TD> kdn, IVisitFunction.Binary<T, IMultidimensional<TD>> visitFunction) {
 		if(!kdn.removed()) {
 			kdn.visit(visitFunction);
 		}
@@ -208,7 +228,8 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 			preDfs(rc, visitFunction);
 		}
 	}
-	private static <T, TD extends Comparable<TD>> void inDfs(KDNode<T, TD> kdn, IVisitFunction.Binary<T, IMultidimensional<TD>> visitFunction) {
+	@ApiStatus.Internal
+	static <T, TD extends Comparable<TD>> void inDfs(KDNode<T, TD> kdn, IVisitFunction.Binary<T, IMultidimensional<TD>> visitFunction) {
 		KDNode<T, TD> lc = kdn.leftChild();
 		KDNode<T, TD> rc = kdn.rightChild();
 		if(lc != null) {
@@ -223,7 +244,8 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 			inDfs(rc, visitFunction);
 		}
 	}
-	private static <T, TD extends Comparable<TD>> void postDfs(KDNode<T, TD> kdn, IVisitFunction.Binary<T, IMultidimensional<TD>> visitFunction) {
+	@ApiStatus.Internal
+	static <T, TD extends Comparable<TD>> void postDfs(KDNode<T, TD> kdn, IVisitFunction.Binary<T, IMultidimensional<TD>> visitFunction) {
 		KDNode<T, TD> lc = kdn.leftChild();
 		KDNode<T, TD> rc = kdn.rightChild();
 		if(lc != null) {
@@ -237,6 +259,54 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 			kdn.visit(visitFunction);
 		}
 	}
+
+	@ApiStatus.Internal
+	static <T, TD extends Comparable<TD>> void preDfs(KDNode<T, TD> kdn, IVisitFunction.Simple<KDNode<T, TD>> visitFunction) {
+		if(!kdn.removed()) {
+			visitFunction.visit(kdn);
+		}
+
+		KDNode<T, TD> lc = kdn.leftChild();
+		KDNode<T, TD> rc = kdn.rightChild();
+		if(lc != null) {
+			preDfs(lc, visitFunction);
+		}
+		if(rc != null) {
+			preDfs(rc, visitFunction);
+		}
+	}
+	@ApiStatus.Internal
+	static <T, TD extends Comparable<TD>> void inDfs(KDNode<T, TD> kdn, IVisitFunction.Simple<KDNode<T, TD>> visitFunction) {
+		KDNode<T, TD> lc = kdn.leftChild();
+		KDNode<T, TD> rc = kdn.rightChild();
+		if(lc != null) {
+			inDfs(lc, visitFunction);
+		}
+
+		if(!kdn.removed()) {
+			visitFunction.visit(kdn);
+		}
+
+		if(rc != null) {
+			inDfs(rc, visitFunction);
+		}
+	}
+	@ApiStatus.Internal
+	static <T, TD extends Comparable<TD>> void postDfs(KDNode<T, TD> kdn, IVisitFunction.Simple<KDNode<T, TD>> visitFunction) {
+		KDNode<T, TD> lc = kdn.leftChild();
+		KDNode<T, TD> rc = kdn.rightChild();
+		if(lc != null) {
+			postDfs(lc, visitFunction);
+		}
+		if(rc != null) {
+			postDfs(rc, visitFunction);
+		}
+
+		if(!kdn.removed()) {
+			visitFunction.visit(kdn);
+		}
+	}
+
 	private static <T, TD extends Comparable<TD>> void searchForClosest(KDNode<T, TD> kdn, IMultidimensional<TD> target,
 																		AtomicDouble dist, AtomicReference<KDNode<T, TD>> answer) {
 		KDNode<T, TD> lc = kdn.leftChild();
@@ -297,6 +367,14 @@ public interface KDTree<T, TD extends Comparable<TD>> {
 		}
 		return ret;
 	}
+
+	double getAlpha();
+
+	/**
+	 * If query operations are more frequent, alpha should be smaller (0.55~0.75).
+	 * Instead, if insert and remove operations are more frequent, alpha should be bigger (0.65~0.9).
+	 */
+	void setAlpha(double alpha);
 
 	static <T, TD extends Comparable<TD>> LinkedKDTree<T, TD> newLinkedKDTree(int dimensionSize) {
 		return new LinkedKDTree<>(dimensionSize);
