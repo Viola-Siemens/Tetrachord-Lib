@@ -94,6 +94,11 @@ public final class EditRules {
 			default java.lang.Integer update(@Nullable java.lang.Integer old, @Nullable java.lang.Integer delta) {
 				return Objects.requireNonNull(old) + Objects.requireNonNull(delta);
 			}
+
+			@Override
+			default java.lang.Integer subtract(java.lang.Integer left, java.lang.Integer right) {
+				return left - right;
+			}
 		}
 		public interface MaxAdd extends IEditRule<java.lang.Integer> {
 			@Override
@@ -192,6 +197,11 @@ public final class EditRules {
 			@Override @Nullable
 			default java.lang.Integer update(@Nullable java.lang.Integer old, @Nullable java.lang.Integer delta) {
 				return delta == null ? old : delta;
+			}
+
+			@Override
+			default java.lang.Integer subtract(java.lang.Integer left, java.lang.Integer right) {
+				return left - right;
 			}
 		}
 		public interface MaxSet extends IEditRule<java.lang.Integer> {
@@ -324,6 +334,11 @@ public final class EditRules {
 			default java.lang.Double update(@Nullable java.lang.Double old, @Nullable java.lang.Double delta) {
 				return Objects.requireNonNull(old) + Objects.requireNonNull(delta);
 			}
+
+			@Override
+			default java.lang.Double subtract(java.lang.Double left, java.lang.Double right) {
+				return left - right;
+			}
 		}
 		public interface MaxAdd extends IEditRule<java.lang.Double> {
 			@Override
@@ -422,6 +437,11 @@ public final class EditRules {
 			@Override @Nullable
 			default java.lang.Double update(@Nullable java.lang.Double old, @Nullable java.lang.Double delta) {
 				return delta == null ? old : delta;
+			}
+
+			@Override
+			default java.lang.Double subtract(java.lang.Double left, java.lang.Double right) {
+				return left - right;
 			}
 		}
 		public interface MaxSet extends IEditRule<java.lang.Double> {

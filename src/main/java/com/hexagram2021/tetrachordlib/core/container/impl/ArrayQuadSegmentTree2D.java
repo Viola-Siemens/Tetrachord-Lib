@@ -7,6 +7,10 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
 
 import java.util.Arrays;
 
+/**
+ * Notice that this data structure will make an n*n area to store data. For example, input array is 6*31, and the tree will be 32*32.
+ * Be careful when using this to store "thin and long" areas to prevent memory overloaded.
+ */
 public class ArrayQuadSegmentTree2D<T> implements SegmentTree2D<T> {
 	private static int leftUpChild(int index) {
 		return (index << 2) + 1;
@@ -357,7 +361,7 @@ public class ArrayQuadSegmentTree2D<T> implements SegmentTree2D<T> {
 	}
 
 	@Override
-	public int sideSize() {
+	public int sideSize(int dimension) {
 		return this.size;
 	}
 	@Override

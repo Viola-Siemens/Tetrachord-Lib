@@ -17,7 +17,7 @@ plugins {
 }
 apply plugin: 'net.minecraftforge.gradle'
 
-version = '1.19+1.0.1'
+version = '1.19+1.0.2'
 group = 'com.hexagram2021.tetrachordlib'
 
 base {
@@ -168,6 +168,7 @@ publishing {
             pom {
                 url.set("https://github.com/Viola-Siemens/Tetrachord-Lib.git")
             }
+            artifact sourceJar
         }
     }
 }
