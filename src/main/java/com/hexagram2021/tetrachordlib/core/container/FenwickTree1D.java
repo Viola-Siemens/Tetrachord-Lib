@@ -1,7 +1,11 @@
 package com.hexagram2021.tetrachordlib.core.container;
 
+import com.hexagram2021.tetrachordlib.core.container.impl.ArrayFenwickTree1D;
+import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
+
 import java.util.function.Consumer;
 
+@SuppressWarnings("unused")
 public interface FenwickTree1D<T> {
 	/**
 	 * Edit a value from index.
@@ -22,7 +26,7 @@ public interface FenwickTree1D<T> {
 		return this.getEditRule().subtract(this.query(end - 1), this.query(begin - 1));
 	}
 	/**
-	 * Query the prefix sum of a segment [0, length), notice that length is inclusive.
+	 * Query the prefix sum of a segment [0, length], notice that length is inclusive.
 	 * @param length	Length of the prefix sum.
 	 * @return			The prefix sum.
 	 */
@@ -36,4 +40,11 @@ public interface FenwickTree1D<T> {
 	int size();
 
 	void visit(int length, Consumer<T> consumer);
+
+	static <T> ArrayFenwickTree1D<T> newArrayFenwickTree1D(int length, IEditRule<T> editRule, Int2ObjectFunction<T[]> sizedArray) {
+		return new ArrayFenwickTree1D<>(length, editRule, sizedArray);
+	}
+	static <T> ArrayFenwickTree1D<T> newArrayFenwickTree1D(T[] array, IEditRule<T> editRule, Int2ObjectFunction<T[]> sizedArray) {
+		return new ArrayFenwickTree1D<>(array, editRule, sizedArray);
+	}
 }
