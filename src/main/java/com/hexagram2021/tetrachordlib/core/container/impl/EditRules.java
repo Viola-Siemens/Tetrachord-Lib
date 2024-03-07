@@ -53,6 +53,10 @@ public final class EditRules {
 			default java.lang.Integer update(@Nullable java.lang.Integer old, @Nullable java.lang.Integer delta) {
 				return delta == null ? old : delta;
 			}
+			@Override
+			default java.lang.Integer subtract(java.lang.Integer left, java.lang.Integer right) {
+				return left - right;
+			}
 		}
 
 		public static Count count() {

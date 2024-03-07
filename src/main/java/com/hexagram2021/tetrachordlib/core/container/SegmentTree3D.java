@@ -27,7 +27,7 @@ public interface SegmentTree3D<T> {
 	 * @param endY		Bottom bound (exclusive) of y-axis of the volume.
 	 * @param beginZ	North bound (inclusive) of z-axis of the volume.
 	 * @param endZ		South bound (exclusive) of z-axis of the volume.
-	 * @return			The combination of an volume.
+	 * @return			The combination of a volume.
 	 */
 	T query(int beginX, int endX, int beginY, int endY, int beginZ, int endZ);
 
