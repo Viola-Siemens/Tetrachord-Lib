@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 /**
  * @param <T>	The type of value that this SegmentTree maintains.
  */
+@SuppressWarnings("unused")
 public interface IEditRule<T> {
 	/**
 	 * @return	Default value of type &lt;T&gt; when build a segment tree.
@@ -51,9 +52,21 @@ public interface IEditRule<T> {
 	 * @param old		Old delta.
 	 * @param delta		Amount of the edit on each element of this segment/area.
 	 * @return			Combined result.
-	 */@Nullable
+	 */
+	@Nullable
 	T update(@Nullable T old, @Nullable T delta);
+
+	/**
+	 * Only implement this when you are using Fenwick Tree.<br>
+	 * Example 1: For sum, subtract(a, b) = a - b;<br>
+	 * Example 2: For multiply, subtract(a, b) = a / b;
+	 * @return		Subtraction of left and right.
+	 */
 	default T subtract(T left, T right) {
 		throw new UnsupportedOperationException("Subtraction is not implemented.");
+	}
+
+	default T exact(T value) {
+		return value;
 	}
 }

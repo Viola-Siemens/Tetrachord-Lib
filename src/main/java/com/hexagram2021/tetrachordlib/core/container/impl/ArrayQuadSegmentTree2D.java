@@ -3,6 +3,7 @@ package com.hexagram2021.tetrachordlib.core.container.impl;
 import com.hexagram2021.tetrachordlib.core.algorithm.Algorithm;
 import com.hexagram2021.tetrachordlib.core.container.IEditRule;
 import com.hexagram2021.tetrachordlib.core.container.SegmentTree2D;
+import com.hexagram2021.tetrachordlib.core.container.VisitConsumer2D;
 import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
 
 import java.util.Arrays;
@@ -237,10 +238,10 @@ public class ArrayQuadSegmentTree2D<T> implements SegmentTree2D<T> {
 		return this.editRule.edit(result, this.adder[index], endX - beginX, endY - beginY);
 	}
 
-	private void visit(int index, int leftBound, int topBound, int length, int beginX, int endX, int beginY, int endY, VisitConsumer<T> consumer) {
+	private void visit(int index, int leftBound, int topBound, int length, int beginX, int endX, int beginY, int endY, VisitConsumer2D<T> consumer) {
 		assert(length > 0 && leftBound <= beginX && leftBound + length >= endX && topBound <= beginY && topBound + length >= endY);
 		if(this.isLeaf(index)) {
-			consumer.accept(leftBound, topBound, this.value[index]);
+			consumer.visit(leftBound, topBound, this.value[index]);
 			return;
 		}
 		int halfLength = length >> 1;
@@ -370,7 +371,7 @@ public class ArrayQuadSegmentTree2D<T> implements SegmentTree2D<T> {
 	}
 
 	@Override
-	public void visit(int beginX, int endX, int beginY, int endY, VisitConsumer<T> consumer) {
+	public void visit(int beginX, int endX, int beginY, int endY, VisitConsumer2D<T> consumer) {
 		this.visit(0, 0, 0, this.size, beginX, endX, beginY, endY, consumer);
 	}
 }
