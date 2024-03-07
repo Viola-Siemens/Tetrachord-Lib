@@ -2,9 +2,7 @@ package com.hexagram2021.tetrachordlib;
 
 import com.google.common.collect.Lists;
 import com.hexagram2021.tetrachordlib.core.algorithm.Algorithm;
-import com.hexagram2021.tetrachordlib.core.container.IMultidimensional;
-import com.hexagram2021.tetrachordlib.core.container.KDTree;
-import com.hexagram2021.tetrachordlib.core.container.SegmentTree2D;
+import com.hexagram2021.tetrachordlib.core.container.*;
 import com.hexagram2021.tetrachordlib.core.container.impl.*;
 
 import java.io.IOException;
@@ -15,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main {
 	private static final String FOLDER = "src/test/java/com/hexagram2021/tetrachordlib/";
@@ -390,7 +389,7 @@ public class Main {
 		System.out.printf("\tinsert: %dms, remove: %dms, query: %dms\n", insert, remove, query);
 	}
 
-	private static void testFenwickTree1D() throws IOException {
+	private static void testFenwickTree1D1() throws IOException {
 		//https://www.luogu.com.cn/problem/P3374
 
 		int n, m, op, x, y;
@@ -431,7 +430,147 @@ public class Main {
 				failed.set(true);
 			}
 		});
-		System.out.print("Test Fenwick Tree: ");
+		System.out.print("Test Case (Fenwick Tree 1D): ");
+		System.out.println(failed.get() ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
+	}
+
+	private static void testFenwickTree1D() {
+		final int SIZE = 1020;
+		int[] array = new int[SIZE];
+		Integer[] build = new Integer[SIZE];
+		AtomicBoolean failed = new AtomicBoolean(false);
+		for(int i = 0; i < SIZE; ++i) {
+			build[i] = array[i] = Algorithm.randInt(0, 32);
+		}
+		FenwickTree1D<Integer> ft = FenwickTree1D.newArrayFenwickTree1D(build, EditRules.Integer.sumAdd(), Integer[]::new);
+		for(int i = 0; i < 32768; ++i) {
+			int x = Algorithm.randInt(0, SIZE - 1);
+			if(Algorithm.randInt(0, 4) == 0) {
+				int k = Algorithm.randInt(-8, 8);
+				if(k == 0) {
+					k = 8;
+				}
+				array[x] += k;
+				ft.edit(k, x);
+				if(LOG_DETAIL) {
+					System.out.printf("\tEdit %d at (%d).\n", k, x);
+				}
+			} else {
+				int x2 = Algorithm.randInt(x + 1, SIZE + 1);
+				int output = ft.query(x, x2);
+				int ans = 0;
+				for(int dx = x; dx < x2; ++dx) {
+					ans += array[dx];
+				}
+				if(LOG_DETAIL) {
+					System.out.printf("\tQuery: (%d, %d).Expect: %d. Found: %d.\n", x, x2, ans, output);
+				}
+				if(Math.abs(ans - output) > 1e-6) {
+					System.out.printf("Wrong output! Expect: %d. Found: %d.\n", ans, output);
+					failed.set(true);
+				}
+			}
+		}
+		final AtomicInteger cnt = new AtomicInteger(0);
+		ft.visit(SIZE, value -> {
+			if(array[cnt.get()] != value) {
+				System.out.printf("Wrong visit! Expect: %d. Found: %d.\n", array[cnt.get()], value);
+				failed.set(true);
+			}
+			cnt.addAndGet(1);
+		});
+		System.out.print("Test Fenwick Tree 1D: ");
+		System.out.println(failed.get() ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
+	}
+
+	public static void testFenwickTree2D1() throws IOException {
+		//https://loj.ac/p/133
+
+		int n, m, op, x1, y1, x2, y2;
+		java.util.Scanner in = new java.util.Scanner(Files.newInputStream(Paths.get(FOLDER + "ft2d.in")));
+		java.util.Scanner out = new java.util.Scanner(Files.newInputStream(Paths.get(FOLDER + "ft2d.out")));
+		AtomicBoolean failed = new AtomicBoolean(false);
+		n = in.nextInt();
+		m = in.nextInt();
+		FenwickTree2D<Integer> ft = FenwickTree2D.newArrayFenwickTree2D(n, m, EditRules.Integer.sumAdd(), (x, y) -> new Integer[x][y]);
+		while(in.hasNext()) {
+			op = in.nextInt();
+			x1 = in.nextInt();
+			y1 = in.nextInt();
+			x2 = in.nextInt();
+			if(op == 1) {
+				ft.edit(x2, x1 - 1, y1 - 1);
+			} else {
+				y2 = in.nextInt();
+				int output = ft.query(x1 - 1, x2, y1 - 1, y2);
+				int ans = out.nextInt();
+				if(output != ans) {
+					System.out.printf("Wrong output! Expect: %d. Found: %d.\n", ans, output);
+					failed.set(true);
+				}
+			}
+		}
+		ft.visit(n, m, (x, y, value) -> {
+			int ans = out.nextInt();
+			if(ans != value) {
+				System.out.printf("Wrong visit at (%d, %d)! Expect: %d. Found: %d.\n", x, y, ans, value);
+				failed.set(true);
+			}
+		});
+		System.out.print("Test Case (Fenwick Tree 2D): ");
+		System.out.println(failed.get() ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
+	}
+
+	private static void testFenwickTree2D() {
+		final int SIZE = 1020;
+		int[][] array = new int[SIZE][SIZE >> 1];
+		Integer[][] build = new Integer[SIZE][SIZE >> 1];
+		AtomicBoolean failed = new AtomicBoolean(false);
+		for(int i = 0; i < SIZE; ++i) {
+			for(int j = 0; j < (SIZE >> 1); ++j) {
+				build[i][j] = array[i][j] = Algorithm.randInt(0, 32);
+			}
+		}
+		FenwickTree2D<Integer> ft = FenwickTree2D.newArrayFenwickTree2D(build, EditRules.Integer.sumAdd(), (xs, ys) -> new Integer[xs][ys]);
+		for(int i = 0; i < 32768; ++i) {
+			int x = Algorithm.randInt(0, SIZE - 1);
+			int y = Algorithm.randInt(0, (SIZE >> 1) - 1);
+			if(Algorithm.randInt(0, 4) == 0) {
+				int k = Algorithm.randInt(-8, 8);
+				if(k == 0) {
+					k = 8;
+				}
+				array[x][y] += k;
+				ft.edit(k, x, y);
+				if(LOG_DETAIL) {
+					System.out.printf("\tEdit %d at (%d, %d).\n", k, x, y);
+				}
+			} else {
+				int x2 = Algorithm.randInt(x + 1, SIZE + 1);
+				int y2 = Algorithm.randInt(y + 1, (SIZE >> 1) + 1);
+				int output = ft.query(x, x2, y, y2);
+				int ans = 0;
+				for(int dx = x; dx < x2; ++dx) {
+					for(int dy = y; dy < y2; ++dy) {
+						ans += array[dx][dy];
+					}
+				}
+				if(LOG_DETAIL) {
+					System.out.printf("\tQuery: (%d, %d, %d, %d).Expect: %d. Found: %d.\n", x, x2, y, y2, ans, output);
+				}
+				if(Math.abs(ans - output) > 1e-6) {
+					System.out.printf("Wrong output! Expect: %d. Found: %d.\n", ans, output);
+					failed.set(true);
+				}
+			}
+		}
+		ft.visit(SIZE, SIZE >> 1, (x, y, value) -> {
+			if(array[x][y] != value) {
+				System.out.printf("Wrong visit! Expect: %d. Found: %d.\n", array[x][y], value);
+				failed.set(true);
+			}
+		});
+		System.out.print("Test Fenwick Tree 2D: ");
 		System.out.println(failed.get() ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
 	}
 
@@ -446,7 +585,10 @@ public class Main {
 			testKDTreeTime();
 			testSegmentTree1();
 			testSegmentTree();
+			testFenwickTree1D1();
+			testFenwickTree2D1();
 			testFenwickTree1D();
+			testFenwickTree2D();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

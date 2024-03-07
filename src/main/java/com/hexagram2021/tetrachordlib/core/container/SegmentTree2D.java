@@ -35,17 +35,12 @@ public interface SegmentTree2D<T> {
 	int sideSize(int dimension);
 	int totalSize();
 
-	void visit(int beginX, int endX, int beginY, int endY, VisitConsumer<T> consumer);
+	void visit(int beginX, int endX, int beginY, int endY, VisitConsumer2D<T> consumer);
 
 	static <T> ArrayQuadSegmentTree2D<T> newArrayQuadSegmentTree2D(int length, IEditRule<T> editRule, Int2ObjectFunction<T[]> sizedArray) {
 		return new ArrayQuadSegmentTree2D<>(length, editRule, sizedArray);
 	}
 	static <T> ArrayQuadSegmentTree2D<T> newArrayQuadSegmentTree2D(T[][] array, IEditRule<T> editRule, Int2ObjectFunction<T[]> sizedArray) {
 		return new ArrayQuadSegmentTree2D<>(array, editRule, sizedArray);
-	}
-
-	@FunctionalInterface
-	interface VisitConsumer<T> {
-		void accept(int x, int y, T value);
 	}
 }

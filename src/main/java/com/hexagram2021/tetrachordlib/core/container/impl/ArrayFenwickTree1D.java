@@ -60,23 +60,20 @@ public class ArrayFenwickTree1D<T> implements FenwickTree1D<T> {
 		if(length <= 0) {
 			throw new IllegalArgumentException(String.format("Cannot build a fenwick tree with length %d.", length));
 		}
-		int hb = Algorithm.highbit(length - 1);
-		this.size = hb << 1;
+		this.size = Algorithm.highbit(length - 1) << 1;
 		this.value = sizedArray.get(this.size);
-		int lb = Algorithm.lowbit(this.size);
-		this.value[this.size - 1] = this.editRule.combine(this.build(this.size - 1 - (lb >> 1)), this.editRule.elementDefault());
+		this.value[this.size - 1] = this.editRule.combine(this.build((this.size >> 1) - 1), this.editRule.elementDefault());
 	}
 	public ArrayFenwickTree1D(T[] array, IEditRule<T> editRule, Int2ObjectFunction<T[]> sizedArray) {
 		this.editRule = editRule;
 		if(array.length == 0) {
 			throw new IllegalArgumentException("Cannot build a fenwick tree with length 0.");
 		}
-		int hb = Algorithm.highbit(array.length - 1);
-		this.size = hb << 1;
+		int size = Algorithm.highbit(array.length - 1) << 1;
+		this.size = Math.max(size, 0x10);
 		this.value = sizedArray.get(this.size);
-		int lb = Algorithm.lowbit(this.size);
 		T current = this.size - 1 < array.length ? array[this.size - 1] : this.editRule.elementDefault();
-		this.value[this.size - 1] = this.editRule.combine(this.build(array, this.size - 1 - (lb >> 1)), current);
+		this.value[this.size - 1] = this.editRule.combine(this.build(array, (this.size >> 1) - 1), current);
 	}
 
 	@Override
@@ -110,8 +107,7 @@ public class ArrayFenwickTree1D<T> implements FenwickTree1D<T> {
 
 	@Override
 	public void visit(int length, Consumer<T> consumer) {
-		int lb = Algorithm.lowbit(this.size);
-		T left = this.visit(this.size - 1 - (lb >> 1), length, consumer);
+		T left = this.visit((this.size >> 1) - 1, length, consumer);
 		if(this.size - 1 < length) {
 			consumer.accept(this.editRule.subtract(this.value[this.size - 1], left));
 		}
