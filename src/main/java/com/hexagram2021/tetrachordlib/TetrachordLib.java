@@ -1,18 +1,16 @@
 package com.hexagram2021.tetrachordlib;
 
-//import com.hexagram2021.tetrachordlib.benchmark.*;
-
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Mod;
+import net.fabricmc.api.ModInitializer;
 
 @SuppressWarnings("unused")
-@Mod(TetrachordLib.MODID)
-public class TetrachordLib {
+public class TetrachordLib implements ModInitializer {
 	public static final String MODID = "tetrachordlib";
 	public static final String MODNAME = "Tetrachord Lib";
 
 	public TetrachordLib() {
-		//MinecraftForge.EVENT_BUS.register(new OreBlocksNearBeaconIncreaseXpDrop());
-		MinecraftForge.EVENT_BUS.register(this);
+	}
+
+	@Override
+	public void onInitialize() {
 	}
 }

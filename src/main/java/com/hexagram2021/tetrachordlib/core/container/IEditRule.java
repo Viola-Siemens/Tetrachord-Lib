@@ -1,6 +1,6 @@
 package com.hexagram2021.tetrachordlib.core.container;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @param <T>	The type of value that this SegmentTree maintains.
@@ -13,7 +13,8 @@ public interface IEditRule<T> {
 	T elementDefault();
 	/**
 	 * @return	Zero value of type &lt;T&gt;.
-	 */@Nullable
+	 */
+	@Nullable
 	T zero();
 
 	/**

@@ -1,8 +1,8 @@
 package com.hexagram2021.tetrachordlib.core.container.impl;
 
 import com.hexagram2021.tetrachordlib.core.container.IEditRule;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Objects;
 
 @SuppressWarnings("unused")

@@ -3,8 +3,8 @@ package com.hexagram2021.tetrachordlib.core.container;
 import com.google.common.collect.Queues;
 import com.google.common.util.concurrent.AtomicDouble;
 import com.hexagram2021.tetrachordlib.core.container.impl.LinkedKDTree;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Queue;

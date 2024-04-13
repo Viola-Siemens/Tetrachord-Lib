@@ -1,8 +1,9 @@
 package com.hexagram2021.tetrachordlib.core.container.impl;
 
 import com.hexagram2021.tetrachordlib.core.container.IMultidimensional;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -73,7 +74,7 @@ public class DoublePosition implements IMultidimensional<Double> {
 		return Math.sqrt(ret);
 	}
 
-	@Override
+	@Override @NotNull
 	public Iterator<Double> iterator() {
 		return Arrays.stream(this.dimensions).iterator();
 	}

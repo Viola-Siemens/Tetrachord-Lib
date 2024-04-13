@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "tetrachordlib",
+  "version": "${version}",
+  "name": "Tetrachord Lib",
+  "description": "A lightweight library mod that provides various data structures such as KD Trees and Segment Trees, alongside some other utilitarian functionalities.",
+  "authors": [
+    "Liu Dongyu"
+  ],
+  "contact": {
+    "repo": "https://github.com/Viola-Siemens/Tetrachord-Lib"
+  },
+  "license": "LGPL-2.1",
+  "icon": "logo.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.hexagram2021.tetrachordlib.TetrachordLib"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.14.19",
+    "minecraft": "1.16.5"
+  }
+}
