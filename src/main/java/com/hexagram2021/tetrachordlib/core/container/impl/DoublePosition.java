@@ -86,8 +86,7 @@ public class DoublePosition implements IMultidimensional<Double> {
 	}
 	@Override
 	public boolean equals(@Nullable Object obj) {
-		if(obj instanceof DoublePosition) {
-			DoublePosition md = (DoublePosition)obj;
+		if(obj instanceof DoublePosition md) {
 			if (this.getDimensionSize() == md.getDimensionSize()) {
 				for (int i = 0; i < this.getDimensionSize(); ++i) {
 					if (this.dimensions[i] != md.getDimension(i)) {

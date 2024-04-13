@@ -86,8 +86,7 @@ public class IntPosition implements IMultidimensional<Integer> {
 	}
 	@Override
 	public boolean equals(@Nullable Object obj) {
-		if(obj instanceof IntPosition) {
-			IntPosition md = (IntPosition)obj;
+		if(obj instanceof IntPosition md) {
 			if (this.getDimensionSize() == md.getDimensionSize()) {
 				for (int i = 0; i < this.getDimensionSize(); ++i) {
 					if (this.dimensions[i] != md.getDimension(i)) {
