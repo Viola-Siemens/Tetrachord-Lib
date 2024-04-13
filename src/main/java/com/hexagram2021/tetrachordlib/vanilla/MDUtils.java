@@ -2,11 +2,11 @@ package com.hexagram2021.tetrachordlib.vanilla;
 
 import com.hexagram2021.tetrachordlib.core.container.impl.DoublePosition;
 import com.hexagram2021.tetrachordlib.core.container.impl.IntPosition;
-import com.mojang.math.Vector3d;
-import com.mojang.math.Vector3f;
 import net.minecraft.core.Position;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.ChunkPos;
+import org.joml.Vector3d;
+import org.joml.Vector3f;
 
 @SuppressWarnings("unused")
 public final class MDUtils {
