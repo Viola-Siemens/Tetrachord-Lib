@@ -6,7 +6,7 @@ buildscript {
         maven { name="sponge"; url 'https://repo.spongepowered.org/repository/maven-public/' }
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '[6.0,6.2)', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '[6.0.24,6.2)', changing: true
     }
 }
 
@@ -17,7 +17,7 @@ plugins {
 }
 apply plugin: 'net.minecraftforge.gradle'
 
-version = '1.20+1.0.3'
+version = '1.20.6+1.0.3'
 group = 'com.hexagram2021.tetrachordlib'
 
 base {
@@ -25,11 +25,13 @@ base {
 }
 archivesBaseName = 'tetrachordlib'
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
-    mappings channel: 'official', version: '1.20.1'
+    mappings channel: 'official', version: '1.20.6'
+
+    //reobf = false
 
     enableIdeaPrepareRuns = true
     copyIdeResources = true
@@ -40,9 +42,7 @@ minecraft {
             workingDirectory project.file('run/client')
 
             property 'forge.logging.markers', 'REGISTRIES'
-
             property 'forge.logging.console.level', 'debug'
-
             property 'forge.enabledGameTestNamespaces', 'tetrachordlib'
 
             mods {
@@ -56,9 +56,7 @@ minecraft {
             workingDirectory project.file('run/server')
 
             property 'forge.logging.markers', 'REGISTRIES'
-
             property 'forge.logging.console.level', 'debug'
-
             property 'forge.enabledGameTestNamespaces', 'tetrachordlib'
 
             mods {
@@ -72,9 +70,7 @@ minecraft {
             workingDirectory project.file('run/testServer')
 
             property 'forge.logging.markers', 'REGISTRIES'
-
             property 'forge.logging.console.level', 'debug'
-
             property 'forge.enabledGameTestNamespaces', 'tetrachordlib'
 
             mods {
@@ -88,9 +84,7 @@ minecraft {
             workingDirectory project.file('run/data')
 
             property 'forge.logging.markers', 'REGISTRIES'
-
             property 'forge.logging.console.level', 'debug'
-
             args '--mod', 'tetrachordlib', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
             mods {
@@ -119,7 +113,8 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.20.1-47.2.0'
+    minecraft 'net.minecraftforge:forge:1.20.6-50.1.0'
+    implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
 
 //    runtimeOnly fg.deobf("curse.maven:jei-238222:5101366")
 //    runtimeOnly fg.deobf("curse.maven:jade-324717:4986594")
