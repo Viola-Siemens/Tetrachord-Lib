@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.0.+'
+    id 'fabric-loom' version '1.6.11'
     id 'maven-publish'
 }
 
@@ -40,7 +40,7 @@ processResources {
     }
 }
 
-def targetJavaVersion = 17
+def targetJavaVersion = 21
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = "UTF-8"
     if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
