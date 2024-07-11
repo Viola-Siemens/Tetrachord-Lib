@@ -1,29 +1,30 @@
 modLoader="javafml"
-loaderVersion="[41,)"
-license="LGPL v2.1"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
 issueTrackerURL="https://github.com/Viola-Siemens/Tetrachord-Lib/issues"
 
 [[mods]]
-modId="tetrachordlib"
-version="${file.jarVersion}"
-displayName="Tetrachord Lib"
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
 logoFile="logo.png"
-credits="Liu Dongyu"
-authors="Hexagram"
-description='''
-A lightweight library mod that provides various data structures such as KD Trees and Segment Trees, alongside a straightforward web socket functionality (TODO).
-'''
+credits="Hexagram"
+authors="${mod_authors}"
+description='''${mod_description}'''
 
-[[dependencies.tetrachordlib]]
-    modId="forge"
-    mandatory=true
-    versionRange="[41,)"
-    ordering="NONE"
-    side="BOTH"
+# [[accessTransformers]]
+#     file="META-INF/accesstransformer.cfg"
 
-[[dependencies.tetrachordlib]]
-    modId="minecraft"
-    mandatory=true
-    versionRange="[1.19,)"
-    ordering="NONE"
-    side="BOTH"
+[[dependencies.${mod_id}]]
+modId="neoforge"
+mandatory=true
+versionRange="${neo_version_range}"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="minecraft"
+mandatory=true
+versionRange="${minecraft_version_range}"
+ordering="NONE"
+side="BOTH"
