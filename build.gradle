@@ -65,6 +65,8 @@ repositories {
 
 dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
+
+    testImplementation 'org.junit.platform:junit-platform-console-standalone:1.9.2'
 }
 
 tasks.withType(ProcessResources).configureEach {

@@ -4,6 +4,9 @@ import com.google.common.collect.Lists;
 import com.hexagram2021.tetrachordlib.core.algorithm.Algorithm;
 import com.hexagram2021.tetrachordlib.core.container.*;
 import com.hexagram2021.tetrachordlib.core.container.impl.*;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -13,15 +16,16 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Main {
-	private static final String FOLDER = "src/test/java/com/hexagram2021/tetrachordlib/";
+public class MainTest {
+	private static String FOLDER = "src/test/resources/";
 
 	private static final boolean LOG_DETAIL = false;
 
 	private static final int XZBound = 1024;
 	private static final int YBound = 32;
 
-	private static void testSegmentTree1() throws FileNotFoundException {
+	@Test
+	public void testSegmentTree1() throws FileNotFoundException {
 		//https://www.luogu.com.cn/problem/P4514
 
 		String OP;
@@ -56,10 +60,11 @@ public class Main {
 			}
 		}
 		System.out.print("Test Case (Segment Tree): ");
-		System.out.println(failed ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
+		checkTestResult(failed);
 	}
 
-	private static void testSegmentTree() {
+	@Test
+	public void testSegmentTree() {
 		//Simulate Players' Behavior
 		int[][] array = new int[1024][1024];
 		SegmentTree2D<Integer> st = SegmentTree2D.newArrayQuadSegmentTree2D(1024, EditRules.Integer.sumAdd(), Integer[]::new);
@@ -98,10 +103,11 @@ public class Main {
 			}
 		}
 		System.out.print("Test Segment Tree: ");
-		System.out.println(failed ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
+		checkTestResult(failed);
 	}
 
-	private static void testKDTree1() throws FileNotFoundException {
+	@Test
+	public void testKDTree1() throws FileNotFoundException {
 		//https://www.luogu.com.cn/problem/P6247
 
 		KDTree<Integer, Double> kdt = KDTree.newLinkedKDTree(2);
@@ -123,7 +129,7 @@ public class Main {
 
 		double nearest = 2e9, farthest = 0;
 		kdt.setInitSepDim(sepDim);
-		kdt.insert(list.get(0));
+		kdt.insert(list.getFirst());
 		for(int i = 1; i < list.size(); ++i) {
 			double dist = kdt.findClosest(list.get(i).value()).distanceWith(list.get(i).value());
 			if(nearest > dist) {
@@ -138,10 +144,11 @@ public class Main {
 		System.out.print("Test Case (KD Tree 2): ");
 		boolean failed = !"%.2f".formatted(nearest).equals(out.next());
 		failed |= !"%.2f".formatted(farthest).equals(out.next());
-		System.out.println(failed ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
+		checkTestResult(failed);
 	}
 
-	private static void testKDTree2() throws FileNotFoundException {
+	@Test
+	public void testKDTree2() throws FileNotFoundException {
 		KDTree<Integer, Integer> kdt = KDTree.newLinkedKDTree(2);
 		java.util.Scanner in = new java.util.Scanner(new FileInputStream(FOLDER + "kdt.in"));
 		java.util.Scanner out = new java.util.Scanner(new FileInputStream(FOLDER + "kdt.out"));
@@ -174,11 +181,12 @@ public class Main {
 		System.out.print("Test Case (KD Tree 1): ");
 		boolean failed = !"%.2f".formatted(nearest).equals(out.next());
 		failed |= !"%.2f".formatted(farthest).equals(out.next());
-		System.out.println(failed ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
+		checkTestResult(failed);
 	}
 
 	@SuppressWarnings("unchecked")
-	private static void testKDTree() {
+	@Test
+	public void testKDTree() {
 		//Simulate Players' Behavior
 		IntPosition[] arr = new IntPosition[1024];
 		for(int i = 0; i < 1024; ++i) {
@@ -230,11 +238,12 @@ public class Main {
 			}
 		}
 		System.out.print("Test KD Tree: ");
-		System.out.println(failed ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
+		checkTestResult(failed);
 	}
 
 	@SuppressWarnings("unchecked")
-	private static void testKDTreeMaintainability() {
+	@Test
+	public void testKDTreeMaintainability() {
 		//Simulate Players' Behavior
 		IntPosition[] arr = new IntPosition[1024];
 		for(int i = 0; i < 1024; ++i) {
@@ -287,7 +296,8 @@ public class Main {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static void testKDTreeTime() {
+	@Test
+	public void testKDTreeTime() {
 		//Simulate Players' Behavior
 		IntPosition[] arr = new IntPosition[1024];
 		for(int i = 0; i < 1024; ++i) {
@@ -386,7 +396,8 @@ public class Main {
 		System.out.printf("\tinsert: %dms, remove: %dms, query: %dms\n", insert, remove, query);
 	}
 
-	private static void testFenwickTree1D1() throws FileNotFoundException {
+	@Test
+	public void testFenwickTree1D1() throws FileNotFoundException {
 		//https://www.luogu.com.cn/problem/P3374
 
 		int n, m, op, x, y;
@@ -431,7 +442,8 @@ public class Main {
 		System.out.println(failed.get() ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
 	}
 
-	private static void testFenwickTree1D() {
+	@Test
+	public void testFenwickTree1D() {
 		final int SIZE = 1020;
 		int[] array = new int[SIZE];
 		Integer[] build = new Integer[SIZE];
@@ -480,7 +492,8 @@ public class Main {
 		System.out.println(failed.get() ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
 	}
 
-	public static void testFenwickTree2D1() throws FileNotFoundException {
+	@Test
+	public void testFenwickTree2D1() throws FileNotFoundException {
 		//https://loj.ac/p/133
 
 		int n, m, op, x1, y1, x2, y2;
@@ -518,7 +531,8 @@ public class Main {
 		System.out.println(failed.get() ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
 	}
 
-	private static void testFenwickTree2D() {
+	@Test
+	public void testFenwickTree2D() {
 		final int SIZE = 1020;
 		int[][] array = new int[SIZE][SIZE >> 1];
 		Integer[][] build = new Integer[SIZE][SIZE >> 1];
@@ -573,21 +587,39 @@ public class Main {
 
 	@SuppressWarnings("CallToPrintStackTrace")
 	public static void main(String[] args) {
+		MainTest main = new MainTest();
+		debugOnly = true;
 		Algorithm.setSeed(42);
 		try {
-			testKDTree1();
-			testKDTree2();
-			testKDTree();
-			testKDTreeMaintainability();
-			testKDTreeTime();
-			testSegmentTree1();
-			testSegmentTree();
-			testFenwickTree1D1();
-			testFenwickTree2D1();
-			testFenwickTree1D();
-			testFenwickTree2D();
+			main.testKDTree1();
+			main.testKDTree2();
+			main.testKDTree();
+			main.testKDTreeMaintainability();
+			main.testKDTreeTime();
+			main.testSegmentTree1();
+			main.testSegmentTree();
+			main.testFenwickTree1D1();
+			main.testFenwickTree2D1();
+			main.testFenwickTree1D();
+			main.testFenwickTree2D();
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	@BeforeClass
+	public static void setupAll() {
+		debugOnly = false;
+		Algorithm.setSeed(System.currentTimeMillis());
+		FOLDER = "../../" + FOLDER;
+	}
+
+	private static boolean debugOnly = false;
+	private static void checkTestResult(boolean failed) {
+		if(debugOnly) {
+			System.out.println(failed ? "\033[31mTEST FAILED!!!\033[0m" : "\033[32mTEST PASSED.\033[0m");
+		} else {
+			Assert.assertFalse(failed);
 		}
 	}
 }
