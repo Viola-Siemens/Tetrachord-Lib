@@ -21,7 +21,7 @@ public final class MDUtils {
 		return new IntPosition(vec3i.getX(), vec3i.getY(), vec3i.getZ());
 	}
 	public static IntPosition chunkPos(ChunkPos chunkPos) {
-		return new IntPosition(chunkPos.x, chunkPos.z);
+		return new IntPosition(chunkPos.x(), chunkPos.z());
 	}
 
 	public static DoublePosition position(Position position) {
